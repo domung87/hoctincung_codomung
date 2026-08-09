@@ -84,6 +84,63 @@
 }
 
 /* ============================================================================
+   2. HIỆU ỨNG 2 BẠN HỌC SINH GẬT ĐẦU VÀ CHỚP MẮT THEO NHỊP SỐNG ĐỘNG
+   ============================================================================ */
+@keyframes student-nod-boy {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  30% {
+    transform: translateY(-4px) rotate(1.5deg);
+  }
+  60% {
+    transform: translateY(2px) rotate(-1deg);
+  }
+  80% {
+    transform: translateY(-1px) rotate(0.5deg);
+  }
+}
+
+.animate-student-boy {
+  animation: student-nod-boy 3.4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+@keyframes student-nod-girl {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  35% {
+    transform: translateY(-5px) rotate(-1.5deg);
+  }
+  65% {
+    transform: translateY(2px) rotate(1deg);
+  }
+  85% {
+    transform: translateY(-1px) rotate(-0.5deg);
+  }
+}
+
+.animate-student-girl {
+  animation: student-nod-girl 3.8s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+/* Hiệu ứng chớp mắt tinh tế */
+@keyframes eye-blink-overlay {
+  0%, 94%, 98%, 100% {
+    opacity: 0;
+  }
+  95%, 97% {
+    opacity: 0.25;
+  }
+}
+
+.animate-eye-blink {
+  animation: eye-blink-overlay 4s ease-in-out infinite;
+}
+
+/* ============================================================================
    4. HIỆU ỨNG ÁNH SAO ĐÊM & BỤI NẮNG NGÀY (DAY / NIGHT PARTICLES)
    ============================================================================ */
 @keyframes star-twinkle {

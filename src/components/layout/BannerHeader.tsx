@@ -11,9 +11,7 @@ import {
   ZoomIn, 
   ZoomOut, 
   RotateCcw,
-  Music,
-  GraduationCap,
-  Award
+  Music
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../../context/AppContext';
@@ -42,7 +40,7 @@ export const BannerHeader: React.FC = () => {
   // 4. Feature: Like Banner with Mini Confetti Fireworks
   const [likesCount, setLikesCount] = useState<number>(() => {
     const saved = localStorage.getItem('tinhoc6_banner_likes');
-    return saved ? parseInt(saved, 10) : 635;
+    return saved ? parseInt(saved, 10) : 642;
   });
   const [hasLiked, setHasLiked] = useState<boolean>(false);
 
@@ -150,18 +148,18 @@ export const BannerHeader: React.FC = () => {
     <div className="w-full select-none relative overflow-hidden bg-gradient-to-r from-[#FF5E82] via-[#FF7A57] to-[#FFA53B] shadow-md border-b-2 border-pink-300/80">
       
       {/* =========================================================================
-          MAIN PANORAMIC BANNER CONTAINER (3 KHỐI: BÉ TRAI - CÔ ĐỖ MỪNG - BÉ GÁI)
+          MAIN PANORAMIC BANNER CONTAINER (BÉ TRAI GẬT ĐẦU - CÔ ĐỖ MỪNG - BÉ GÁI GẬT ĐẦU)
           ========================================================================= */}
       <div className="w-full max-w-[1520px] mx-auto relative flex items-center justify-between px-2 sm:px-4 lg:px-6">
         
         {/* =======================================================================
-            KHỐI 1: BÉ TRAI HỌC SINH CUTE 3D TAY CẦM SÁCH BÚT (BÊN TRÁI GÓC BANNER)
+            KHỐI 1: BÉ TRAI HỌC SINH CUTE 3D - GẬT ĐẦU & CHỚP MẮT THEO NHỊP (GÓC TRÁI)
             ======================================================================= */}
         <div 
           onMouseEnter={() => setIsBoyHovered(true)}
           onMouseLeave={() => setIsBoyHovered(false)}
           onClick={handleStudentBoyClick}
-          className="hidden xl:flex flex-col items-center justify-center relative z-20 cursor-pointer group/boy w-40 shrink-0 transform hover:scale-105 transition-all duration-300"
+          className="hidden xl:flex flex-col items-center justify-center relative z-20 cursor-pointer group/boy w-36 shrink-0 transform hover:scale-105 transition-all duration-300 animate-student-boy"
           title="Bấm để trò chuyện với bạn Nam (Lớp 6A)"
         >
           {/* Boy Speech Bubble on Hover */}
@@ -171,19 +169,15 @@ export const BannerHeader: React.FC = () => {
             </div>
           )}
 
-          {/* 3D Boy Avatar Card with Red Scarf & Book */}
-          <div className="w-32 h-44 rounded-3xl overflow-hidden shadow-2xl border-3 border-white/90 bg-white/40 backdrop-blur-md p-1 group-hover/boy:border-blue-300 transition-all flex flex-col items-center justify-center">
+          {/* 3D Boy Portrait Card (Không còn thẻ danh hiệu theo yêu cầu) */}
+          <div className="relative w-32 h-44 rounded-3xl overflow-hidden shadow-2xl border-3 border-white/90 bg-white/40 backdrop-blur-md p-1 group-hover/boy:border-blue-300 transition-all flex flex-col items-center justify-center">
             <img 
               src="/images/student_boy.jpg" 
               alt="Học sinh nam Tin học 6" 
               className="w-full h-full object-cover rounded-2xl"
             />
-          </div>
-
-          {/* Student Badge */}
-          <div className="mt-1 px-3 py-0.5 rounded-full bg-blue-600/90 text-white text-[10px] font-black shadow-md border border-blue-200 flex items-center gap-1 backdrop-blur-xs">
-            <GraduationCap className="w-3 h-3 text-yellow-300" />
-            <span>Bạn Nam • 6A</span>
+            {/* Subtle Eyelid Blink Overlay */}
+            <div className="absolute inset-0 bg-amber-950 pointer-events-none rounded-2xl animate-eye-blink" />
           </div>
         </div>
 
@@ -339,13 +333,13 @@ export const BannerHeader: React.FC = () => {
         </div>
 
         {/* =======================================================================
-            KHỐI 3: BÉ GÁI HỌC SINH CUTE 3D TAY CẦM SÁCH BÚT (BÊN PHẢI GÓC BANNER)
+            KHỐI 3: BÉ GÁI HỌC SINH CUTE 3D - GẬT ĐẦU & CHỚP MẮT THEO NHỊP (GÓC PHẢI)
             ======================================================================= */}
         <div 
           onMouseEnter={() => setIsGirlHovered(true)}
           onMouseLeave={() => setIsGirlHovered(false)}
           onClick={handleStudentGirlClick}
-          className="hidden xl:flex flex-col items-center justify-center relative z-20 cursor-pointer group/girl w-40 shrink-0 transform hover:scale-105 transition-all duration-300"
+          className="hidden xl:flex flex-col items-center justify-center relative z-20 cursor-pointer group/girl w-36 shrink-0 transform hover:scale-105 transition-all duration-300 animate-student-girl"
           title="Bấm để trò chuyện với bạn Mai (Lớp 6B)"
         >
           {/* Girl Speech Bubble on Hover */}
@@ -355,19 +349,15 @@ export const BannerHeader: React.FC = () => {
             </div>
           )}
 
-          {/* 3D Girl Avatar Card with Ribbons & Book */}
-          <div className="w-32 h-44 rounded-3xl overflow-hidden shadow-2xl border-3 border-white/90 bg-white/40 backdrop-blur-md p-1 group-hover/girl:border-pink-300 transition-all flex flex-col items-center justify-center">
+          {/* 3D Girl Portrait Card (Không còn thẻ danh hiệu theo yêu cầu) */}
+          <div className="relative w-32 h-44 rounded-3xl overflow-hidden shadow-2xl border-3 border-white/90 bg-white/40 backdrop-blur-md p-1 group-hover/girl:border-pink-300 transition-all flex flex-col items-center justify-center">
             <img 
               src="/images/student_girl.jpg" 
               alt="Học sinh nữ Tin học 6" 
               className="w-full h-full object-cover rounded-2xl"
             />
-          </div>
-
-          {/* Student Badge */}
-          <div className="mt-1 px-3 py-0.5 rounded-full bg-pinkBrand-600/90 text-white text-[10px] font-black shadow-md border border-pink-200 flex items-center gap-1 backdrop-blur-xs">
-            <Award className="w-3 h-3 text-yellow-300" />
-            <span>Bạn Mai • 6B</span>
+            {/* Subtle Eyelid Blink Overlay */}
+            <div className="absolute inset-0 bg-amber-950 pointer-events-none rounded-2xl animate-eye-blink" style={{ animationDelay: '1.8s' }} />
           </div>
         </div>
 
