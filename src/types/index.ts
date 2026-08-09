@@ -5,7 +5,7 @@ export interface UserProfile {
   email: string;
   full_name: string;
   role: UserRole;
-  classroom?: string; // Ví dụ: 'Lớp 6A1', 'Lớp 6A2'
+  classroom?: string;
   username?: string;
   password?: string;
   avatar_url: string;
@@ -19,7 +19,7 @@ export interface UserProfile {
 
 export interface Tin6Topic {
   id: string;
-  code: string; // 'A', 'B', 'C', 'D', 'E', 'F'
+  code: string;
   title: string;
   description: string;
   iconName: string;
@@ -34,6 +34,39 @@ export interface ComponentDetail {
   example: string;
 }
 
+export interface VideoTimestamp {
+  time: string;
+  seconds: number;
+  title: string;
+}
+
+export interface VideoComment {
+  id: string;
+  video_id: string;
+  user_name: string;
+  user_avatar: string;
+  user_role: UserRole;
+  comment_text: string;
+  created_at: string;
+}
+
+export interface LessonVideo {
+  id: string;
+  lesson_id: string;
+  lesson_title: string;
+  topic_code: string;
+  video_url: string;
+  thumbnail_url: string;
+  teacher_name: string;
+  teacher_avatar: string;
+  duration: string;
+  views_count: number;
+  description: string;
+  timestamps: VideoTimestamp[];
+  comments?: VideoComment[];
+  created_at: string;
+}
+
 export interface Tin6Lesson {
   id: string;
   topicCode: string;
@@ -46,6 +79,7 @@ export interface Tin6Lesson {
   components?: ComponentDetail[];
   contentHtml?: string;
   quizQuestionIds?: string[];
+  video?: LessonVideo;
 }
 
 export type QuestionType = 'single_choice' | 'multiple_choice' | 'true_false' | 'fill_blank';
@@ -98,11 +132,11 @@ export interface StudentEvaluation {
   student_code: string;
   classroom: string;
   avatar_url: string;
-  attendance_score: number; // 0-10
-  quiz_avg_score: number; // 0-10
-  practice_score: number; // 0-10
-  assignment_score: number; // 0-10
-  final_score: number; // ĐTB môn Tin 6 (0-10)
+  attendance_score: number;
+  quiz_avg_score: number;
+  practice_score: number;
+  assignment_score: number;
+  final_score: number;
   grade_level: GradeLevel;
   teacher_remarks: string;
   badges_earned: string[];

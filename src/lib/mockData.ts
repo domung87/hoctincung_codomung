@@ -5,7 +5,8 @@ import {
   Assignment, 
   Submission, 
   SystemNotification,
-  StudentEvaluation
+  StudentEvaluation,
+  LessonVideo
 } from '../types';
 
 export const INITIAL_PROFILES: UserProfile[] = [
@@ -772,5 +773,149 @@ export const INITIAL_EVALUATIONS: StudentEvaluation[] = [
     teacher_remarks: 'Ý thức học tập tốt, hoàn thành bài tập đúng hạn.',
     badges_earned: ['⭐ Học Sinh Giỏi'],
     updated_at: '2026-08-09T08:00:00Z'
+  }
+];
+
+export const INITIAL_VIDEOS: LessonVideo[] = [
+  {
+    id: 'vid-1',
+    lesson_id: 'lesson-1',
+    lesson_title: 'Bài 1: Thông tin và dữ liệu',
+    topic_code: 'A',
+    video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // Hoặc link video bài giảng Tin 6
+    thumbnail_url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80',
+    teacher_name: 'Cô Đỗ Mừng 💖',
+    teacher_avatar: '/images/avatar_co_mung.jpg',
+    duration: '14:25',
+    views_count: 1520,
+    description: 'Video bài giảng chi tiết Bài 1: Thông tin và dữ liệu. Cô Đỗ Mừng hướng dẫn các em phân biệt rõ khái niệm Thông tin, Dữ liệu, Vật mang tin và khám phá 4 thành phần cơ bản của hệ thống máy tính.',
+    timestamps: [
+      { time: '00:00', seconds: 0, title: 'Khởi động & Lời chào từ Cô Đỗ Mừng' },
+      { time: '02:30', seconds: 150, title: 'Phần 1: Thông tin và dữ liệu là gì?' },
+      { time: '06:15', seconds: 375, title: 'Phần 2: Vật mang tin trong đời sống' },
+      { time: '09:40', seconds: 580, title: 'Phần 3: Tầm quan trọng của thông tin' },
+      { time: '12:50', seconds: 770, title: 'Tổng kết bài học & Hướng dẫn làm bài tập' }
+    ],
+    comments: [
+      {
+        id: 'c-1',
+        video_id: 'vid-1',
+        user_name: 'Em Nguyễn Gia Bảo (6A1)',
+        user_avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=giabao6a1',
+        user_role: 'student',
+        comment_text: 'Thưa cô, video bài giảng của cô giảng rất dễ hiểu ạ! Em đã làm đúng 100/100 bài trắc nghiệm sau khi xem xong video ạ.',
+        created_at: '2 giờ trước'
+      },
+      {
+        id: 'c-2',
+        video_id: 'vid-1',
+        user_name: 'Cô Đỗ Mừng',
+        user_avatar: '/images/avatar_co_mung.jpg',
+        user_role: 'teacher',
+        comment_text: 'Cô khen Gia Bảo rất chăm chỉ và tiếp thu bài nhanh nhé! Chúc em luôn giữ vững tinh thần học tập 🌸💖',
+        created_at: '1 giờ trước'
+      }
+    ],
+    created_at: '2026-08-01T08:00:00Z'
+  },
+  {
+    id: 'vid-2',
+    lesson_id: 'lesson-2',
+    lesson_title: 'Bài 2: Xử lý thông tin',
+    topic_code: 'A',
+    video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    thumbnail_url: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=600&auto=format&fit=crop&q=80',
+    teacher_name: 'Cô Đỗ Mừng 💖',
+    teacher_avatar: '/images/avatar_co_mung.jpg',
+    duration: '18:10',
+    views_count: 1240,
+    description: 'Video hướng dẫn quy trình 4 bước xử lý thông tin và thực hành 5 thao tác chuẩn xác với chuột máy tính.',
+    timestamps: [
+      { time: '00:00', seconds: 0, title: 'Giới thiệu quy trình xử lý thông tin' },
+      { time: '04:10', seconds: 250, title: '4 Bước xử lý thông tin của con người & máy tính' },
+      { time: '10:20', seconds: 620, title: 'Thực hành: 5 Thao tác với chuột máy tính' },
+      { time: '16:00', seconds: 960, title: 'Bài tập vận dụng củng cố' }
+    ],
+    created_at: '2026-08-02T08:00:00Z'
+  },
+  {
+    id: 'vid-3',
+    lesson_id: 'lesson-3',
+    lesson_title: 'Bài 3: Thông tin trong máy tính',
+    topic_code: 'A',
+    video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    thumbnail_url: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80',
+    teacher_name: 'Cô Đỗ Mừng 💖',
+    teacher_avatar: '/images/avatar_co_mung.jpg',
+    duration: '21:05',
+    views_count: 980,
+    description: 'Khám phá thế giới dãy bit 0 và 1 nhị phân cùng bảng quy đổi đơn vị đo dung lượng Byte, KB, MB, GB, TB.',
+    timestamps: [
+      { time: '00:00', seconds: 0, title: 'Đặt vấn đề: Máy tính hiểu ngôn ngữ gì?' },
+      { time: '05:00', seconds: 300, title: 'Dãy bit và cách biểu diễn ký tự' },
+      { time: '12:30', seconds: 750, title: 'Bảng đơn vị đo dung lượng thông tin' },
+      { time: '18:15', seconds: 1095, title: 'Bài tập tính toán dung lượng USB và thẻ nhớ' }
+    ],
+    created_at: '2026-08-03T08:00:00Z'
+  },
+  {
+    id: 'vid-4',
+    lesson_id: 'lesson-4',
+    lesson_title: 'Bài 4: Mạng máy tính',
+    topic_code: 'B',
+    video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    thumbnail_url: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=600&auto=format&fit=crop&q=80',
+    teacher_name: 'Cô Đỗ Mừng 💖',
+    teacher_avatar: '/images/avatar_co_mung.jpg',
+    duration: '16:45',
+    views_count: 890,
+    description: 'Tìm hiểu mạng máy tính là gì, các thành phần thiết bị đầu cuối, thiết bị kết nối Switch/Router và lợi ích chia sẻ tài nguyên.',
+    timestamps: [
+      { time: '00:00', seconds: 0, title: 'Mạng máy tính là gì?' },
+      { time: '04:50', seconds: 290, title: 'Các thành phần của mạng máy tính' },
+      { time: '10:15', seconds: 615, title: 'Lợi ích của mạng máy tính' },
+      { time: '14:30', seconds: 870, title: 'Tổng kết & Câu hỏi trắc nghiệm' }
+    ],
+    created_at: '2026-08-04T08:00:00Z'
+  },
+  {
+    id: 'vid-11',
+    lesson_id: 'lesson-11',
+    lesson_title: 'Bài 11: Sơ đồ tư duy',
+    topic_code: 'D',
+    video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    thumbnail_url: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600&auto=format&fit=crop&q=80',
+    teacher_name: 'Cô Đỗ Mừng 💖',
+    teacher_avatar: '/images/avatar_co_mung.jpg',
+    duration: '22:15',
+    views_count: 1420,
+    description: 'Hướng dẫn vẽ sơ đồ tư duy Mindmap bằng tay và trên máy tính để tóm tắt bài học siêu nhanh và sáng tạo.',
+    timestamps: [
+      { time: '00:00', seconds: 0, title: 'Sơ đồ tư duy là gì?' },
+      { time: '05:30', seconds: 330, title: 'Các thành phần của một sơ đồ tư duy chuẩn' },
+      { time: '11:45', seconds: 705, title: 'Thực hành: Vẽ sơ đồ tư duy tóm tắt Chủ đề A' },
+      { time: '18:50', seconds: 1130, title: 'Mẹo chọn màu sắc và từ khóa' }
+    ],
+    created_at: '2026-08-05T08:00:00Z'
+  },
+  {
+    id: 'vid-15',
+    lesson_id: 'lesson-15',
+    lesson_title: 'Bài 15: Thuật toán',
+    topic_code: 'F',
+    video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    thumbnail_url: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=600&auto=format&fit=crop&q=80',
+    teacher_name: 'Cô Đỗ Mừng 💖',
+    teacher_avatar: '/images/avatar_co_mung.jpg',
+    duration: '25:30',
+    views_count: 1680,
+    description: 'Tư duy thuật toán, xác định Đầu vào Input, Đầu ra Output và cách vẽ sơ đồ khối Flowchart sinh động.',
+    timestamps: [
+      { time: '00:00', seconds: 0, title: 'Khái niệm thuật toán trong cuộc sống' },
+      { time: '06:20', seconds: 380, title: 'Đầu vào (Input) và Đầu ra (Output)' },
+      { time: '13:10', seconds: 790, title: 'Vẽ sơ đồ khối: Ovan, Chữ nhật, Hình thoi' },
+      { time: '20:45', seconds: 1245, title: 'Thực hành: Thuật toán pha trà sữa / Giải toán' }
+    ],
+    created_at: '2026-08-06T08:00:00Z'
   }
 ];

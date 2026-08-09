@@ -13,7 +13,8 @@ import {
   Crown,
   Check,
   Zap,
-  Target
+  Target,
+  Video
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../../context/AppContext';
@@ -26,6 +27,7 @@ export const LessonContent: React.FC = () => {
     activeLesson, 
     selectedLessonId,
     setSelectedLessonId,
+    setActiveTab,
     setIsPracticeModalOpen, 
     setIsQuizModalOpen,
     toggleCompleteLesson 
@@ -64,6 +66,11 @@ export const LessonContent: React.FC = () => {
     setIsQuizModalOpen(true);
   };
 
+  const handleGoToVideo = () => {
+    sound.click();
+    setActiveTab('library');
+  };
+
   const handleNavigate = (lessonId: string) => {
     sound.click();
     setSelectedLessonId(lessonId);
@@ -82,9 +89,18 @@ export const LessonContent: React.FC = () => {
           </span>
 
           <div className="flex items-center gap-3">
+            {/* Quick Watch Video Button */}
+            <button
+              onClick={handleGoToVideo}
+              className="px-3.5 py-1 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-black flex items-center gap-1.5 transition-all shadow-xs border border-blue-200"
+            >
+              <Video className="w-3.5 h-3.5 text-blue-600" />
+              <span>🎬 Xem Video Bài Giảng</span>
+            </button>
+
             <span className="text-xs text-slate-400 font-bold flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5 text-pinkBrand-500" />
-              <span>Thời lượng: {activeLesson.durationMinutes} phút</span>
+              <span>{activeLesson.durationMinutes} phút</span>
             </span>
 
             {activeLesson.isCompleted ? (
@@ -198,12 +214,12 @@ export const LessonContent: React.FC = () => {
             <Heart className="w-3.5 h-3.5 fill-pinkBrand-500" />
           </div>
           <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-            "Sau khi đọc xong lý thuyết, các em hãy nhấn nút <strong>Xác nhận hoàn thành</strong> bên dưới để tích lũy XP, sau đó chuyển sang <strong>Luyện tập</strong> và <strong>Trò chơi</strong> để rèn luyện kỹ năng nhé!"
+            "Sau khi đọc xong lý thuyết, các em hãy nhấn nút <strong>Xem video bài giảng</strong> hoặc nhấn <strong>Xác nhận hoàn thành</strong> bên dưới để tích lũy XP, sau đó chuyển sang <strong>Luyện tập</strong> và <strong>Trò chơi</strong> nhé!"
           </p>
         </div>
       </div>
 
-      {/* 6. BOTTOM ACTION BAR (Theo đúng yêu cầu của Thầy/Cô) */}
+      {/* 6. BOTTOM ACTION BAR */}
       <div className="pt-6 border-t border-pink-100 dark:border-slate-800 space-y-4">
         
         {/* Main Action Buttons */}
@@ -218,6 +234,15 @@ export const LessonContent: React.FC = () => {
           </button>
 
           <div className="flex items-center gap-2.5 flex-wrap w-full sm:w-auto">
+            {/* Nút Video Bài Giảng */}
+            <button
+              onClick={handleGoToVideo}
+              className="flex-1 sm:flex-none px-5 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md hover:scale-105 transition-all flex items-center justify-center gap-1.5"
+            >
+              <Video className="w-4 h-4" />
+              <span>🎬 Xem Video Bài Giảng</span>
+            </button>
+
             {/* Nút 2: Chuyển Qua Luyện Tập */}
             <button
               onClick={handleGoToPractice}
@@ -263,7 +288,7 @@ export const LessonContent: React.FC = () => {
 
       </div>
 
-      {/* Floating Mascot AI Assistant Cô Đỗ Mừng (Góc Dưới Bên Phải) */}
+      {/* Floating Mascot AI Assistant Cô Đỗ Mừng */}
       <div className="fixed bottom-5 right-5 z-40 flex items-end gap-3 pointer-events-none">
         <div className="bg-white dark:bg-[#1A1E33] p-3.5 rounded-2xl shadow-2xl border-2 border-pink-200 dark:border-slate-700 max-w-xs pointer-events-auto animate-bounce duration-1000 hidden md:block">
           <p className="text-xs font-extrabold text-slate-800 dark:text-white leading-relaxed">
