@@ -4,71 +4,39 @@
 
 @layer base {
   body {
-    @apply font-sans bg-[#FFF6F4] dark:bg-[#0B0D17] text-slate-800 dark:text-slate-100 transition-colors duration-200;
+    @apply font-sans bg-[#F4F5FB] dark:bg-[#0B0D17] text-slate-800 dark:text-slate-100 transition-colors duration-200;
   }
 }
 
-/* ============================================================================
-   TÔNG MÀU CHỦ ĐẠO HỒNG CAM & VIỀN MÀU SẮC NỔI BẬT SINH ĐỘNG
-   ============================================================================ */
-
-/* Glow effect hồng cam rực rỡ */
-.glow-pink-orange {
-  box-shadow: 0 10px 30px -5px rgba(255, 94, 126, 0.35), 0 0 15px rgba(255, 122, 89, 0.25);
+/* Custom Glassmorphism & Pastel Cards */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
 }
 
-.glow-hover:hover {
-  box-shadow: 0 15px 35px -5px rgba(255, 94, 126, 0.45), 0 0 20px rgba(255, 138, 61, 0.35);
-  transform: translateY(-3px);
+.dark .glass-panel {
+  background: rgba(18, 21, 36, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-/* Viền Gradient Hồng Cam */
-.border-gradient-pink-orange {
-  border: 2px solid transparent;
-  background-image: linear-gradient(white, white), linear-gradient(135deg, #FF5288, #FF7A59, #FFA048);
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
+/* 3D Pastel Card Shimmer & Hover Effect */
+.card-pastel-hover {
+  transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Các viền màu sắc cho 6 chủ đề */
-.border-topic-a {
-  border: 2px solid #FF5288;
-  box-shadow: 0 4px 15px rgba(255, 82, 136, 0.15);
+.card-pastel-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 30px -10px rgba(108, 93, 211, 0.25);
 }
 
-.border-topic-b {
-  border: 2px solid #0084FF;
-  box-shadow: 0 4px 15px rgba(0, 132, 255, 0.15);
-}
-
-.border-topic-c {
-  border: 2px solid #10B981;
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
-}
-
-.border-topic-d {
-  border: 2px solid #F59E0B;
-  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
-}
-
-.border-topic-e {
-  border: 2px solid #8B5CF6;
-  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.15);
-}
-
-.border-topic-f {
-  border: 2px solid #EC4899;
-  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.15);
-}
-
-/* 3D Card Hover Effect */
-.card-3d-hover {
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.card-3d-hover:hover {
-  transform: translateY(-4px) scale(1.01);
-  box-shadow: 0 16px 32px -8px rgba(255, 110, 82, 0.25);
+/* Hero Gradient Banner */
+.hero-gradient {
+  background: linear-gradient(135deg, #7F56D9 0%, #6C5DD3 45%, #8E59FF 100%);
+  box-shadow: 0 20px 35px -10px rgba(108, 93, 211, 0.35);
 }
 
 /* Custom Scrollbar */
@@ -82,10 +50,26 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 110, 82, 0.3);
+  background: rgba(108, 93, 211, 0.2);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 110, 82, 0.6);
+  background: rgba(108, 93, 211, 0.4);
+}
+
+/* Pulsing Live Dot */
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.25);
+  }
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
