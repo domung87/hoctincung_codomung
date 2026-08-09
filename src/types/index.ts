@@ -89,6 +89,26 @@ export interface Submission {
   submitted_at: string;
 }
 
+export type GradeLevel = 'xuat_sac' | 'tot' | 'dat' | 'chua_dat';
+
+export interface StudentEvaluation {
+  id: string;
+  student_id: string;
+  student_name: string;
+  student_code: string;
+  classroom: string;
+  avatar_url: string;
+  attendance_score: number; // 0-10
+  quiz_avg_score: number; // 0-10
+  practice_score: number; // 0-10
+  assignment_score: number; // 0-10
+  final_score: number; // ĐTB môn Tin 6 (0-10)
+  grade_level: GradeLevel;
+  teacher_remarks: string;
+  badges_earned: string[];
+  updated_at: string;
+}
+
 export interface SystemNotification {
   id: string;
   title: string;

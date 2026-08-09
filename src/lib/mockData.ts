@@ -4,7 +4,8 @@ import {
   Question, 
   Assignment, 
   Submission, 
-  SystemNotification 
+  SystemNotification,
+  StudentEvaluation
 } from '../types';
 
 export const INITIAL_PROFILES: UserProfile[] = [
@@ -495,5 +496,127 @@ export const INITIAL_NOTIFICATIONS: SystemNotification[] = [
     type: 'assignment',
     created_at: '1 giờ trước',
     is_read: false
+  }
+];
+
+export const INITIAL_EVALUATIONS: StudentEvaluation[] = [
+  {
+    id: 'eval-1',
+    student_id: 'student-em-hoc-sinh',
+    student_name: 'Nguyễn Gia Bảo',
+    student_code: 'HS-6A1-01',
+    classroom: '6A1',
+    avatar_url: 'https://api.dicebear.com/7.x/bottts/svg?seed=giabao6a1',
+    attendance_score: 10.0,
+    quiz_avg_score: 9.8,
+    practice_score: 9.5,
+    assignment_score: 10.0,
+    final_score: 9.8,
+    grade_level: 'xuat_sac',
+    teacher_remarks: 'Học sinh rất thông minh, chăm chỉ, hoàn thành xuất sắc các bài thực hành và tích cực hỗ trợ bạn trong lớp. 🌸',
+    badges_earned: ['🥇 Thủ Khoa Tin 6', '⚡ Thao Tác Siêu Tốc', '🌟 Chuyên Cần 100%'],
+    updated_at: '2026-08-09T08:00:00Z'
+  },
+  {
+    id: 'eval-2',
+    student_id: 'student-2',
+    student_name: 'Trần Minh Ánh',
+    student_code: 'HS-6A1-02',
+    classroom: '6A1',
+    avatar_url: 'https://api.dicebear.com/7.x/bottts/svg?seed=minhanh',
+    attendance_score: 10.0,
+    quiz_avg_score: 9.5,
+    practice_score: 9.0,
+    assignment_score: 9.5,
+    final_score: 9.4,
+    grade_level: 'xuat_sac',
+    teacher_remarks: 'Nắm vững kiến thức phần cứng và mạng máy tính, làm bài trắc nghiệm nhanh và chuẩn xác.',
+    badges_earned: ['🥈 Á Khoa Lớp 6A1', '💡 Tư Duy Logic'],
+    updated_at: '2026-08-09T08:00:00Z'
+  },
+  {
+    id: 'eval-3',
+    student_id: 'student-3',
+    student_name: 'Lê Hoàng Nam',
+    student_code: 'HS-6A1-03',
+    classroom: '6A1',
+    avatar_url: 'https://api.dicebear.com/7.x/bottts/svg?seed=hoangnam',
+    attendance_score: 9.0,
+    quiz_avg_score: 8.8,
+    practice_score: 9.0,
+    assignment_score: 8.5,
+    final_score: 8.8,
+    grade_level: 'tot',
+    teacher_remarks: 'Kỹ năng gõ phím và sử dụng chuột rất tốt, cần chú ý ôn tập thêm phần đơn vị đo dung lượng Byte/Bit.',
+    badges_earned: ['⌨️ Bàn Phím Vàng', '🚀 Tiến Bộ Nhanh'],
+    updated_at: '2026-08-09T08:00:00Z'
+  },
+  {
+    id: 'eval-4',
+    student_id: 'student-4',
+    student_name: 'Phạm Thu Thảo',
+    student_code: 'HS-6A1-04',
+    classroom: '6A1',
+    avatar_url: 'https://api.dicebear.com/7.x/bottts/svg?seed=thuthao',
+    attendance_score: 9.5,
+    quiz_avg_score: 8.5,
+    practice_score: 8.5,
+    assignment_score: 9.0,
+    final_score: 8.7,
+    grade_level: 'tot',
+    teacher_remarks: 'Sơ đồ tư duy vẽ rất đẹp, sáng tạo, tiếp thu bài giảng nhanh.',
+    badges_earned: ['🎨 Nghệ Sĩ Mindmap', '🎀 Chăm Chỉ'],
+    updated_at: '2026-08-09T08:00:00Z'
+  },
+  {
+    id: 'eval-5',
+    student_id: 'student-5',
+    student_name: 'Vũ Đức Mạnh',
+    student_code: 'HS-6A1-05',
+    classroom: '6A1',
+    avatar_url: 'https://api.dicebear.com/7.x/bottts/svg?seed=ducmanh',
+    attendance_score: 8.0,
+    quiz_avg_score: 7.2,
+    practice_score: 7.5,
+    assignment_score: 7.8,
+    final_score: 7.5,
+    grade_level: 'dat',
+    teacher_remarks: 'Có tiến bộ trong các bài thực hành chuột, cần làm thêm các bài trắc nghiệm để củng cố lý thuyết.',
+    badges_earned: ['🌱 Nỗ Lực Học Tập'],
+    updated_at: '2026-08-09T08:00:00Z'
+  },
+  {
+    id: 'eval-6',
+    student_id: 'student-6',
+    student_name: 'Đặng Mai Linh',
+    student_code: 'HS-6A2-01',
+    classroom: '6A2',
+    avatar_url: 'https://api.dicebear.com/7.x/bottts/svg?seed=mailinh',
+    attendance_score: 10.0,
+    quiz_avg_score: 9.6,
+    practice_score: 9.5,
+    assignment_score: 9.5,
+    final_score: 9.6,
+    grade_level: 'xuat_sac',
+    teacher_remarks: 'Học sinh xuất sắc nhất lớp 6A2, rất đam mê lập trình thuật toán.',
+    badges_earned: ['🥇 Thủ Khoa 6A2', '🧠 Siêu Thuật Toán'],
+    updated_at: '2026-08-09T08:00:00Z'
+  },
+  {
+    id: 'eval-7',
+    student_id: 'student-7',
+    student_name: 'Hoàng Quốc Việt',
+    student_code: 'HS-6A2-02',
+    classroom: '6A2',
+    avatar_url: 'https://api.dicebear.com/7.x/bottts/svg?seed=quocviet',
+    attendance_score: 9.0,
+    quiz_avg_score: 8.0,
+    practice_score: 8.5,
+    assignment_score: 8.0,
+    final_score: 8.3,
+    grade_level: 'tot',
+    teacher_remarks: 'Ý thức học tập tốt, hoàn thành bài tập đúng hạn.',
+    badges_earned: ['⭐ Học Sinh Giỏi'],
+    updated_at: '2026-08-09T08:00:00Z'
   }
 ];
