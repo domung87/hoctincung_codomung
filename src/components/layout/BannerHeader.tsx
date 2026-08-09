@@ -11,7 +11,9 @@ import {
   ZoomIn, 
   ZoomOut, 
   RotateCcw,
-  Music
+  Music,
+  GraduationCap,
+  Award
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../../context/AppContext';
@@ -32,13 +34,15 @@ export const BannerHeader: React.FC = () => {
     return currentHour >= 6 && currentHour < 18;
   });
 
-  // 3. 3D Mascot Hover waving interaction
+  // 3. Mascot & Students Hover states
   const [isMascotHovered, setIsMascotHovered] = useState<boolean>(false);
+  const [isBoyHovered, setIsBoyHovered] = useState<boolean>(false);
+  const [isGirlHovered, setIsGirlHovered] = useState<boolean>(false);
 
   // 4. Feature: Like Banner with Mini Confetti Fireworks
   const [likesCount, setLikesCount] = useState<number>(() => {
     const saved = localStorage.getItem('tinhoc6_banner_likes');
-    return saved ? parseInt(saved, 10) : 628;
+    return saved ? parseInt(saved, 10) : 635;
   });
   const [hasLiked, setHasLiked] = useState<boolean>(false);
 
@@ -65,10 +69,25 @@ export const BannerHeader: React.FC = () => {
       confetti({
         particleCount: 45,
         spread: 60,
-        origin: { x: 0.15, y: 0.15 },
+        origin: { x: 0.5, y: 0.2 },
         colors: ['#FF5288', '#FF7A59', '#FFD700', '#FF69B4']
       });
     }
+  };
+
+  // Handle Student Interaction Clicks
+  const handleStudentBoyClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    sound.click();
+    confetti({ particleCount: 30, spread: 50, origin: { x: 0.1, y: 0.2 } });
+    alert('👦 Bé Nam (Lớp 6A): "Em chào Cô Đỗ Mừng ạ! Em rất thích học lập trình và giải bài tập Tin học 6!" 🌸');
+  };
+
+  const handleStudentGirlClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    sound.click();
+    confetti({ particleCount: 30, spread: 50, origin: { x: 0.9, y: 0.2 } });
+    alert('👧 Bé Mai (Lớp 6B): "Học Tin học cùng Cô Đỗ Mừng vui lắm các bạn ơi! Cùng nhau đạt điểm 10 nhé!" 🎀');
   };
 
   // Handle Easter Egg Secret Clicks
@@ -131,173 +150,225 @@ export const BannerHeader: React.FC = () => {
     <div className="w-full select-none relative overflow-hidden bg-gradient-to-r from-[#FF5E82] via-[#FF7A57] to-[#FFA53B] shadow-md border-b-2 border-pink-300/80">
       
       {/* =========================================================================
-          BANNER WRAPPER: HIỂN THỊ ĐỦ 100% KÍCH THƯỚC KHÔNG BỊ CẮT HÌNH CÔ GIÁO
+          MAIN PANORAMIC BANNER CONTAINER (3 KHỐI: BÉ TRAI - CÔ ĐỖ MỪNG - BÉ GÁI)
           ========================================================================= */}
-      <div 
-        onClick={handleOpenZoomModal}
-        className="max-w-[1440px] mx-auto relative cursor-pointer group flex items-center justify-center"
-      >
+      <div className="w-full max-w-[1520px] mx-auto relative flex items-center justify-between px-2 sm:px-4 lg:px-6">
         
-        {/* BỨC TRANH 3D GỐC SIÊU NÉT: ĐỦ MẶT CÔ GIÁO, CHỮ 3D VÀ TOÀN BỘ SÁCH VỞ / LAPTOP */}
-        <div className="relative w-full aspect-[736/380] max-h-[380px] overflow-hidden flex items-center justify-center">
-          <img
-            src="/images/banner_tin6_real.png"
-            alt="HỌC TIN CÙNG CÔ ĐỖ MỪNG"
-            className="w-full h-full object-contain object-center block transition-transform duration-500 group-hover:scale-[1.008]"
-            style={{ imageRendering: 'auto' }}
-          />
-
-          {/* =======================================================================
-              1. HIỆU ỨNG TIA SÁNG QUÉT NHẸ (SHIMMER SWEEP MỖI 6 GIÂY)
-              ======================================================================= */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
-            <div className="w-1/3 h-[250%] bg-gradient-to-r from-transparent via-white/35 to-transparent absolute -top-1/2 left-0 animate-shimmer-sweep pointer-events-none" />
-          </div>
-
-          {/* =======================================================================
-              2. HIỆU ỨNG ÁNH SÁNG NGÀY / ĐÊM (DAY / NIGHT OVERLAY & PARTICLES)
-              ======================================================================= */}
-          {isDayTime ? (
-            <div className="absolute inset-0 pointer-events-none z-10">
-              <div className="absolute inset-0 bg-gradient-to-tr from-amber-400/5 via-yellow-200/10 to-transparent mix-blend-overlay" />
-              <div className="absolute top-3 left-1/4 w-2.5 h-2.5 rounded-full bg-yellow-200 blur-[1px] animate-sunbeam-float" />
-              <div className="absolute top-8 right-1/3 w-3 h-3 rounded-full bg-amber-300/80 blur-[1px] animate-sunbeam-float" style={{ animationDelay: '1.5s' }} />
-              <div className="absolute bottom-6 left-1/2 w-2.5 h-2.5 rounded-full bg-yellow-100 blur-[1px] animate-sunbeam-float" style={{ animationDelay: '2.8s' }} />
-            </div>
-          ) : (
-            <div className="absolute inset-0 pointer-events-none z-10">
-              <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/25 via-purple-950/15 to-transparent mix-blend-multiply" />
-              <div className="absolute top-3 left-1/5 text-yellow-200 text-xs animate-star-twinkle">✨</div>
-              <div className="absolute top-6 right-1/4 text-amber-200 text-xs animate-star-twinkle" style={{ animationDelay: '0.8s' }}>⭐</div>
-              <div className="absolute top-10 left-2/3 text-white text-[10px] animate-star-twinkle" style={{ animationDelay: '1.6s' }}>✨</div>
-              <div className="absolute bottom-5 right-1/5 text-yellow-300 text-xs animate-star-twinkle" style={{ animationDelay: '2.1s' }}>⭐</div>
+        {/* =======================================================================
+            KHỐI 1: BÉ TRAI HỌC SINH CUTE 3D TAY CẦM SÁCH BÚT (BÊN TRÁI GÓC BANNER)
+            ======================================================================= */}
+        <div 
+          onMouseEnter={() => setIsBoyHovered(true)}
+          onMouseLeave={() => setIsBoyHovered(false)}
+          onClick={handleStudentBoyClick}
+          className="hidden xl:flex flex-col items-center justify-center relative z-20 cursor-pointer group/boy w-40 shrink-0 transform hover:scale-105 transition-all duration-300"
+          title="Bấm để trò chuyện với bạn Nam (Lớp 6A)"
+        >
+          {/* Boy Speech Bubble on Hover */}
+          {isBoyHovered && (
+            <div className="absolute -top-10 left-0 right-0 bg-white/95 text-slate-800 text-[11px] font-black p-2 rounded-2xl shadow-xl border-2 border-blue-300 text-center animate-in fade-in zoom-in-95 duration-200 backdrop-blur-md">
+              <span>Em chào Cô Mừng! 👦💻</span>
             </div>
           )}
 
-          {/* =======================================================================
-              3. EASTER EGG SECRET TARGETS (3 ĐIỂM BÍ MẬT ẨN TRÊN BANNER)
-              ======================================================================= */}
-          <div 
-            onClick={(e) => handleEggClick(e, 1)}
-            title="Bí mật 1: Chiếc Laptop Coder"
-            className="absolute top-[8%] right-[12%] w-12 h-12 rounded-full cursor-pointer z-20 hover:ring-2 hover:ring-yellow-300/80 transition-all opacity-0 hover:opacity-100 flex items-center justify-center text-sm bg-black/20 backdrop-blur-xs"
-          >
-            {foundEggs.includes(1) ? '✅' : '❓'}
+          {/* 3D Boy Avatar Card with Red Scarf & Book */}
+          <div className="w-32 h-44 rounded-3xl overflow-hidden shadow-2xl border-3 border-white/90 bg-white/40 backdrop-blur-md p-1 group-hover/boy:border-blue-300 transition-all flex flex-col items-center justify-center">
+            <img 
+              src="/images/student_boy.jpg" 
+              alt="Học sinh nam Tin học 6" 
+              className="w-full h-full object-cover rounded-2xl"
+            />
           </div>
 
-          <div 
-            onClick={(e) => handleEggClick(e, 2)}
-            title="Bí mật 2: Sách Tin Học THCS"
-            className="absolute bottom-[6%] right-[10%] w-12 h-12 rounded-full cursor-pointer z-20 hover:ring-2 hover:ring-yellow-300/80 transition-all opacity-0 hover:opacity-100 flex items-center justify-center text-sm bg-black/20 backdrop-blur-xs"
-          >
-            {foundEggs.includes(2) ? '✅' : '❓'}
-          </div>
-
-          <div 
-            onClick={(e) => handleEggClick(e, 3)}
-            title="Bí mật 3: Bút Chỉ Bảng Của Cô Đỗ Mừng"
-            className="absolute top-[26%] left-[22%] w-10 h-10 rounded-full cursor-pointer z-20 hover:ring-2 hover:ring-yellow-300/80 transition-all opacity-0 hover:opacity-100 flex items-center justify-center text-sm bg-black/20 backdrop-blur-xs"
-          >
-            {foundEggs.includes(3) ? '✅' : '❓'}
+          {/* Student Badge */}
+          <div className="mt-1 px-3 py-0.5 rounded-full bg-blue-600/90 text-white text-[10px] font-black shadow-md border border-blue-200 flex items-center gap-1 backdrop-blur-xs">
+            <GraduationCap className="w-3 h-3 text-yellow-300" />
+            <span>Bạn Nam • 6A</span>
           </div>
         </div>
 
         {/* =======================================================================
-            BOTTOM-LEFT TOOLBAR: LỜI CHÀO CÔ ĐỖ MỪNG + NHẠC CHÀO MỪNG + LIKE
+            KHỐI 2: BANNER CHÍNH CÔ GIÁO ĐỖ MỪNG 3D (Ở GIỮA KHÔNG BỊ CẮT XÉN)
             ======================================================================= */}
-        <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-4 z-20 flex items-center gap-2 flex-wrap">
-          
-          {/* Nút Lời Chào Giọng Nói Cô Đỗ Mừng */}
-          <div 
-            onMouseEnter={() => setIsMascotHovered(true)}
-            onMouseLeave={() => setIsMascotHovered(false)}
-            onClick={(e) => {
-              e.stopPropagation();
-              playCoDoMungGreeting();
-            }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white/95 hover:bg-white text-[#FF5288] font-extrabold text-[11px] sm:text-xs shadow-xl hover:scale-105 active:scale-95 transition-all border border-pink-200 backdrop-blur-md cursor-pointer group/mascot"
-          >
-            <div className="w-5 h-5 rounded-full bg-pink-100 flex items-center justify-center text-[#FF5288] group-hover/mascot:scale-110 transition-transform shrink-0">
-              <Volume2 className="w-3 h-3 animate-bounce" />
+        <div 
+          onClick={handleOpenZoomModal}
+          className="flex-1 relative cursor-pointer group flex items-center justify-center max-w-[1080px] mx-auto"
+        >
+          {/* Bức tranh 3D gốc siêu nét đầy đủ 100% hình ảnh */}
+          <div className="relative w-full aspect-[736/380] max-h-[380px] overflow-hidden flex items-center justify-center">
+            <img
+              src="/images/banner_tin6_real.png"
+              alt="HỌC TIN CÙNG CÔ ĐỖ MỪNG"
+              className="w-full h-full object-contain object-center block transition-transform duration-500 group-hover:scale-[1.008]"
+              style={{ imageRendering: 'auto' }}
+            />
+
+            {/* Tia sáng quét nhẹ Shimmer Sweep mỗi 6s */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
+              <div className="w-1/3 h-[250%] bg-gradient-to-r from-transparent via-white/35 to-transparent absolute -top-1/2 left-0 animate-shimmer-sweep pointer-events-none" />
             </div>
-            <span className="drop-shadow-xs">▶ Lời Chào Cô Đỗ Mừng 💖</span>
-            <span className={`text-sm transition-transform ${isMascotHovered ? 'animate-wave-hand' : ''}`}>
-              👋
-            </span>
+
+            {/* Ánh sáng Ngày / Đêm */}
+            {isDayTime ? (
+              <div className="absolute inset-0 pointer-events-none z-10">
+                <div className="absolute inset-0 bg-gradient-to-tr from-amber-400/5 via-yellow-200/10 to-transparent mix-blend-overlay" />
+                <div className="absolute top-3 left-1/4 w-2.5 h-2.5 rounded-full bg-yellow-200 blur-[1px] animate-sunbeam-float" />
+                <div className="absolute top-8 right-1/3 w-3 h-3 rounded-full bg-amber-300/80 blur-[1px] animate-sunbeam-float" style={{ animationDelay: '1.5s' }} />
+                <div className="absolute bottom-6 left-1/2 w-2.5 h-2.5 rounded-full bg-yellow-100 blur-[1px] animate-sunbeam-float" style={{ animationDelay: '2.8s' }} />
+              </div>
+            ) : (
+              <div className="absolute inset-0 pointer-events-none z-10">
+                <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/25 via-purple-950/15 to-transparent mix-blend-multiply" />
+                <div className="absolute top-3 left-1/5 text-yellow-200 text-xs animate-star-twinkle">✨</div>
+                <div className="absolute top-6 right-1/4 text-amber-200 text-xs animate-star-twinkle" style={{ animationDelay: '0.8s' }}>⭐</div>
+                <div className="absolute top-10 left-2/3 text-white text-[10px] animate-star-twinkle" style={{ animationDelay: '1.6s' }}>✨</div>
+                <div className="absolute bottom-5 right-1/5 text-yellow-300 text-xs animate-star-twinkle" style={{ animationDelay: '2.1s' }}>⭐</div>
+              </div>
+            )}
+
+            {/* 3 Điểm bí mật Easter Egg */}
+            <div 
+              onClick={(e) => handleEggClick(e, 1)}
+              title="Bí mật 1: Chiếc Laptop Coder"
+              className="absolute top-[8%] right-[12%] w-12 h-12 rounded-full cursor-pointer z-20 hover:ring-2 hover:ring-yellow-300/80 transition-all opacity-0 hover:opacity-100 flex items-center justify-center text-sm bg-black/20 backdrop-blur-xs"
+            >
+              {foundEggs.includes(1) ? '✅' : '❓'}
+            </div>
+
+            <div 
+              onClick={(e) => handleEggClick(e, 2)}
+              title="Bí mật 2: Sách Tin Học THCS"
+              className="absolute bottom-[6%] right-[10%] w-12 h-12 rounded-full cursor-pointer z-20 hover:ring-2 hover:ring-yellow-300/80 transition-all opacity-0 hover:opacity-100 flex items-center justify-center text-sm bg-black/20 backdrop-blur-xs"
+            >
+              {foundEggs.includes(2) ? '✅' : '❓'}
+            </div>
+
+            <div 
+              onClick={(e) => handleEggClick(e, 3)}
+              title="Bí mật 3: Bút Chỉ Bảng Của Cô Đỗ Mừng"
+              className="absolute top-[26%] left-[22%] w-10 h-10 rounded-full cursor-pointer z-20 hover:ring-2 hover:ring-yellow-300/80 transition-all opacity-0 hover:opacity-100 flex items-center justify-center text-sm bg-black/20 backdrop-blur-xs"
+            >
+              {foundEggs.includes(3) ? '✅' : '❓'}
+            </div>
           </div>
 
-          {/* Nút Phát Nhạc Chuông Chào Mừng */}
-          <button
-            onClick={handlePlayJingle}
-            title="Nghe nhạc chuông vui tai chào mừng"
-            className="px-3 py-1.5 rounded-full bg-white/90 hover:bg-white text-blue-600 font-extrabold text-[11px] shadow-md border border-pink-200 backdrop-blur-md transition-all hover:scale-105 flex items-center gap-1"
-          >
-            <Music className="w-3.5 h-3.5 text-blue-500 animate-spin" style={{ animationDuration: '6s' }} />
-            <span className="hidden sm:inline">Nhạc Chào Mừng 🎶</span>
-          </button>
+          {/* Bottom Left Toolbar: Lời Chào + Nhạc + Like */}
+          <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-4 z-20 flex items-center gap-2 flex-wrap">
+            <div 
+              onMouseEnter={() => setIsMascotHovered(true)}
+              onMouseLeave={() => setIsMascotHovered(false)}
+              onClick={(e) => {
+                e.stopPropagation();
+                playCoDoMungGreeting();
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white/95 hover:bg-white text-[#FF5288] font-extrabold text-[11px] sm:text-xs shadow-xl hover:scale-105 active:scale-95 transition-all border border-pink-200 backdrop-blur-md cursor-pointer group/mascot"
+            >
+              <div className="w-5 h-5 rounded-full bg-pink-100 flex items-center justify-center text-[#FF5288] group-hover/mascot:scale-110 transition-transform shrink-0">
+                <Volume2 className="w-3 h-3 animate-bounce" />
+              </div>
+              <span className="drop-shadow-xs">▶ Lời Chào Cô Đỗ Mừng 💖</span>
+              <span className={`text-sm transition-transform ${isMascotHovered ? 'animate-wave-hand' : ''}`}>
+                👋
+              </span>
+            </div>
 
-          {/* Nút Thích (Like) Banner */}
-          <button
-            onClick={handleLikeBanner}
-            title="Thích banner để bắn pháo hoa mini lấp lánh!"
-            className={`px-3 py-1.5 rounded-full font-extrabold text-[11px] shadow-md border backdrop-blur-md transition-all hover:scale-105 flex items-center gap-1 ${
-              hasLiked
-                ? 'bg-pinkBrand-500 text-white border-pink-300 shadow-pink-300/50'
-                : 'bg-white/90 hover:bg-white text-[#FF5288] border-pink-200'
-            }`}
-          >
-            <Heart className={`w-3.5 h-3.5 ${hasLiked ? 'fill-white' : 'text-[#FF5288]'}`} />
-            <span>{likesCount} Thích</span>
-          </button>
+            <button
+              onClick={handlePlayJingle}
+              title="Nghe nhạc chuông vui tai chào mừng"
+              className="px-3 py-1.5 rounded-full bg-white/90 hover:bg-white text-blue-600 font-extrabold text-[11px] shadow-md border border-pink-200 backdrop-blur-md transition-all hover:scale-105 flex items-center gap-1"
+            >
+              <Music className="w-3.5 h-3.5 text-blue-500 animate-spin" style={{ animationDuration: '6s' }} />
+              <span className="hidden sm:inline">Nhạc Chào Mừng 🎶</span>
+            </button>
+
+            <button
+              onClick={handleLikeBanner}
+              title="Thích banner để bắn pháo hoa mini lấp lánh!"
+              className={`px-3 py-1.5 rounded-full font-extrabold text-[11px] shadow-md border backdrop-blur-md transition-all hover:scale-105 flex items-center gap-1 ${
+                hasLiked
+                  ? 'bg-pinkBrand-500 text-white border-pink-300 shadow-pink-300/50'
+                  : 'bg-white/90 hover:bg-white text-[#FF5288] border-pink-200'
+              }`}
+            >
+              <Heart className={`w-3.5 h-3.5 ${hasLiked ? 'fill-white' : 'text-[#FF5288]'}`} />
+              <span>{likesCount} Thích</span>
+            </button>
+          </div>
+
+          {/* Top Right Toolbar: Ngày/Đêm + Tải HD + Phóng To */}
+          <div className="absolute top-2 right-2 sm:top-3 sm:right-4 z-20 flex items-center gap-1.5 sm:gap-2">
+            <button
+              onClick={toggleDayNightMode}
+              title={isDayTime ? 'Đang bật: Ánh Sáng Ban Mai ☀️ (Bấm đổi sang Ánh Sao Đêm 🌙)' : 'Đang bật: Ánh Sao Đêm 🌙 (Bấm đổi sang Ánh Ban Mai ☀️)'}
+              className="p-1.5 sm:px-3 sm:py-1.5 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-amber-500 font-extrabold text-[11px] shadow-md border border-pink-200 backdrop-blur-md transition-all hover:scale-105 flex items-center gap-1"
+            >
+              {isDayTime ? (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-500 fill-amber-500 animate-spin" style={{ animationDuration: '10s' }} />
+                  <span className="hidden md:inline text-amber-600">Ban Mai ☀️</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-indigo-400 fill-indigo-400" />
+                  <span className="hidden md:inline text-indigo-700">Trăng Sao 🌙</span>
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={handleDownloadWallpaper}
+              title="Tải ảnh Banner 3D Full HD làm hình nền máy tính phòng Tin học"
+              className="p-1.5 sm:px-3 sm:py-1.5 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-pinkBrand-600 font-extrabold text-[11px] shadow-md border border-pink-200 backdrop-blur-md transition-all hover:scale-105 flex items-center gap-1"
+            >
+              <Download className="w-3.5 h-3.5 text-pinkBrand-500" />
+              <span className="hidden md:inline">Tải Hình Nền HD</span>
+            </button>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOpenZoomModal();
+              }}
+              title="Phóng to ngắm tranh vẽ 3D Full HD sắc nét"
+              className="p-1.5 sm:px-3 sm:py-1.5 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-blue-600 font-extrabold text-[11px] shadow-md border border-pink-200 backdrop-blur-md transition-all hover:scale-105 flex items-center gap-1"
+            >
+              <Maximize2 className="w-3.5 h-3.5 text-blue-500" />
+              <span className="hidden md:inline">Phóng To</span>
+            </button>
+          </div>
         </div>
 
         {/* =======================================================================
-            TOP RIGHT TOOLBAR: (NGÀY/ĐÊM + DOWNLOAD HD + ZOOM FULL HD)
+            KHỐI 3: BÉ GÁI HỌC SINH CUTE 3D TAY CẦM SÁCH BÚT (BÊN PHẢI GÓC BANNER)
             ======================================================================= */}
-        <div className="absolute top-2 right-2 sm:top-3 sm:right-4 z-20 flex items-center gap-1.5 sm:gap-2">
-          
-          {/* Nút Chuyển Đổi Ánh Sáng Ngày / Đêm */}
-          <button
-            onClick={toggleDayNightMode}
-            title={isDayTime ? 'Đang bật: Ánh Sáng Ban Mai ☀️ (Bấm đổi sang Ánh Sao Đêm 🌙)' : 'Đang bật: Ánh Sao Đêm 🌙 (Bấm đổi sang Ánh Ban Mai ☀️)'}
-            className="p-1.5 sm:px-3 sm:py-1.5 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-amber-500 font-extrabold text-[11px] shadow-md border border-pink-200 backdrop-blur-md transition-all hover:scale-105 flex items-center gap-1"
-          >
-            {isDayTime ? (
-              <>
-                <Sun className="w-3.5 h-3.5 text-amber-500 fill-amber-500 animate-spin" style={{ animationDuration: '10s' }} />
-                <span className="hidden md:inline text-amber-600">Ban Mai ☀️</span>
-              </>
-            ) : (
-              <>
-                <Moon className="w-3.5 h-3.5 text-indigo-400 fill-indigo-400" />
-                <span className="hidden md:inline text-indigo-700">Trăng Sao 🌙</span>
-              </>
-            )}
-          </button>
+        <div 
+          onMouseEnter={() => setIsGirlHovered(true)}
+          onMouseLeave={() => setIsGirlHovered(false)}
+          onClick={handleStudentGirlClick}
+          className="hidden xl:flex flex-col items-center justify-center relative z-20 cursor-pointer group/girl w-40 shrink-0 transform hover:scale-105 transition-all duration-300"
+          title="Bấm để trò chuyện với bạn Mai (Lớp 6B)"
+        >
+          {/* Girl Speech Bubble on Hover */}
+          {isGirlHovered && (
+            <div className="absolute -top-10 left-0 right-0 bg-white/95 text-slate-800 text-[11px] font-black p-2 rounded-2xl shadow-xl border-2 border-pink-300 text-center animate-in fade-in zoom-in-95 duration-200 backdrop-blur-md">
+              <span>Học Tin thật vui! 👧🌸</span>
+            </div>
+          )}
 
-          {/* Nút Tải Ảnh Banner Làm Hình Nền Máy Tính */}
-          <button
-            onClick={handleDownloadWallpaper}
-            title="Tải ảnh Banner 3D Full HD làm hình nền máy tính phòng Tin học"
-            className="p-1.5 sm:px-3 sm:py-1.5 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-pinkBrand-600 font-extrabold text-[11px] shadow-md border border-pink-200 backdrop-blur-md transition-all hover:scale-105 flex items-center gap-1"
-          >
-            <Download className="w-3.5 h-3.5 text-pinkBrand-500" />
-            <span className="hidden md:inline">Tải Hình Nền HD</span>
-          </button>
+          {/* 3D Girl Avatar Card with Ribbons & Book */}
+          <div className="w-32 h-44 rounded-3xl overflow-hidden shadow-2xl border-3 border-white/90 bg-white/40 backdrop-blur-md p-1 group-hover/girl:border-pink-300 transition-all flex flex-col items-center justify-center">
+            <img 
+              src="/images/student_girl.jpg" 
+              alt="Học sinh nữ Tin học 6" 
+              className="w-full h-full object-cover rounded-2xl"
+            />
+          </div>
 
-          {/* Nút Phóng To Xem Banner Full HD */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleOpenZoomModal();
-            }}
-            title="Phóng to ngắm tranh vẽ 3D Full HD sắc nét"
-            className="p-1.5 sm:px-3 sm:py-1.5 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-blue-600 font-extrabold text-[11px] shadow-md border border-pink-200 backdrop-blur-md transition-all hover:scale-105 flex items-center gap-1"
-          >
-            <Maximize2 className="w-3.5 h-3.5 text-blue-500" />
-            <span className="hidden md:inline">Phóng To</span>
-          </button>
-
+          {/* Student Badge */}
+          <div className="mt-1 px-3 py-0.5 rounded-full bg-pinkBrand-600/90 text-white text-[10px] font-black shadow-md border border-pink-200 flex items-center gap-1 backdrop-blur-xs">
+            <Award className="w-3 h-3 text-yellow-300" />
+            <span>Bạn Mai • 6B</span>
+          </div>
         </div>
 
       </div>
@@ -380,7 +451,7 @@ export const BannerHeader: React.FC = () => {
       )}
 
       {/* =========================================================================
-          MODAL 2: MỞ KHÓA TRỨNG PHỤC SINH BÍ MẬT (EASTER EGG REWARD MODAL)
+          MODAL 2: MỞ KHÓA TRỨNG PHỤC SINH BÍ MẬT
           ========================================================================= */}
       {isEasterEggModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
