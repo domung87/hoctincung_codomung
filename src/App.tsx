@@ -24,17 +24,17 @@ export const App: React.FC = () => {
     refreshDataFromSupabase 
   } = useApp();
 
-  const isSpecialTab = ['council', 'news', 'library', 'tech_market', 'market', 'agency'].includes(activeTab);
+  const isSpecialTab = ['library', 'practice', 'games', 'news', 'gifts'].includes(activeTab);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F7F9FC] dark:bg-[#0B0D17] text-slate-800 dark:text-slate-100 transition-colors duration-200">
-      {/* 1. Top Colorful Banner with "CÙNG HỌC TIN 6 VỚI CÔ ĐỖ MỪNG" */}
+      {/* 1. Top Banner: Học tin cùng cô Đỗ Mừng (Hồng cam + 3D AI Teacher Cute) */}
       <BannerHeader />
 
-      {/* 2. Horizontal Navigation Bar with Mascot Logo & Top-Right Auth (Exact match to reference image) */}
+      {/* 2. Horizontal Navbar: 8 Categories + Bell Notification + Right Profile Pill / Auth */}
       <Navbar />
 
-      {/* 3. Main Body Container */}
+      {/* 3. Main Content Container */}
       <main className="flex-1 max-w-[1440px] w-full mx-auto p-4 md:p-6">
         {activeTab === 'home' && <HomeOverview />}
 

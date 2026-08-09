@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { 
   Home, 
-  Gamepad2, 
-  Crown, 
-  GraduationCap, 
-  Newspaper, 
   BookOpen, 
-  Cpu, 
-  ShoppingBag, 
+  Gamepad2, 
+  GraduationCap, 
+  Crown, 
+  Newspaper, 
   Gift, 
   Trophy, 
   Bell, 
@@ -15,7 +13,8 @@ import {
   LogOut, 
   UserPlus, 
   ChevronDown,
-  ShieldCheck
+  ShieldCheck,
+  Sparkles
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
@@ -28,8 +27,7 @@ export const Navbar: React.FC = () => {
     setIsPracticeModalOpen, 
     setIsQuizModalOpen,
     setIsSupabaseConfigOpen,
-    isLiveSupabase,
-    notifications
+    isLiveSupabase
   } = useApp();
   
   const { 
@@ -42,31 +40,37 @@ export const Navbar: React.FC = () => {
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isNotifDropdownOpen, setIsNotifDropdownOpen] = useState(false);
 
-  // Menu items list matching the exact layout of the user's reference image
+  // 8 Exact Categories matching user's specification:
+  // 1. 🏠 Trang chủ
+  // 2. 📖 Thư viện (Kho tài liệu SGK PDF, Sơ đồ tư duy, Đề cương ôn tập)
+  // 3. 🎮 Bài Học (khu vực chứa các bài học)
+  // 4. 🎓 Luyện tập (chứa các bài luyện tập)
+  // 5. 👑 Trò chơi (chứa các trò chơi liên quan đến bài học)
+  // 6. 📰 Bảng tin (Tin tức công nghệ, AI giáo dục và thông báo học tập)
+  // 7. 🎁 Quà tặng (Quà tặng điểm danh chuyên cần mỗi ngày)
+  // 8. 🏆 Vinh danh (Bảng vàng học sinh tiêu biểu & Thống kê điểm số lớp học)
   const menuItems = [
     { id: 'home', label: 'Trang chủ', icon: Home, isVip: false },
-    { id: 'playground', label: 'Sân trường', icon: Gamepad2, isVip: false },
-    { id: 'council', label: 'Phòng hội đồng', icon: Crown, isVip: true },
-    { id: 'lessons', label: 'Phòng đào tạo', icon: GraduationCap, isVip: false },
-    { id: 'news', label: 'Bảng tin', icon: Newspaper, isVip: false },
     { id: 'library', label: 'Thư viện', icon: BookOpen, isVip: false },
-    { id: 'tech_market', label: 'Chợ công nghệ', icon: Cpu, isVip: false },
-    { id: 'market', label: 'Hội chợ', icon: ShoppingBag, isVip: false },
-    { id: 'agency', label: 'Đại lý', icon: Gift, isVip: false },
+    { id: 'lessons', label: 'Bài Học', icon: Gamepad2, isVip: false },
+    { id: 'practice', label: 'Luyện tập', icon: GraduationCap, isVip: false },
+    { id: 'games', label: 'Trò chơi', icon: Crown, isVip: true },
+    { id: 'news', label: 'Bảng tin', icon: Newspaper, isVip: false },
+    { id: 'gifts', label: 'Quà tặng', icon: Gift, isVip: false },
     { id: 'stats', label: 'Vinh danh', icon: Trophy, isVip: false },
   ];
 
   const handleItemClick = (id: string) => {
     sound.click();
-    if (id === 'playground') {
+    if (id === 'practice') {
       setIsPracticeModalOpen(true);
-      setActiveTab('lessons');
+      setActiveTab('practice');
     } else {
       setActiveTab(id);
     }
   };
 
-  // Get first 2 letters of full name for avatar display
+  // Get first 2 letters of full name for avatar circle initials
   const getInitials = (name: string) => {
     const parts = name.trim().split(' ');
     if (parts.length >= 2) {
@@ -75,6 +79,7 @@ export const Navbar: React.FC = () => {
     return name.slice(0, 2).toUpperCase();
   };
 
+  // Format short name for user pill
   const getShortName = (name: string) => {
     const parts = name.trim().split(' ');
     if (parts.length >= 2) {
@@ -84,93 +89,85 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="w-full bg-white dark:bg-[#151828] border-b border-slate-200/80 dark:border-slate-800 shadow-sm sticky top-0 z-40 transition-colors select-none">
-      <div className="max-w-[1440px] mx-auto px-2 sm:px-4 h-[74px] flex items-center justify-between gap-2 lg:gap-4">
+    <header className="w-full bg-white dark:bg-[#151828] border-b border-slate-200 dark:border-slate-800 shadow-xs sticky top-0 z-40 transition-colors select-none">
+      <div className="max-w-[1440px] mx-auto px-3 sm:px-6 h-[76px] flex items-center justify-between gap-3 lg:gap-6">
         
-        {/* 1. LEFT: Brand Mascot Logo (Matching image mascot) */}
+        {/* 1. LEFT: Brand Icon / Mascot */}
         <div 
           onClick={() => {
             sound.click();
             setActiveTab('home');
           }}
-          className="flex items-center gap-2 cursor-pointer shrink-0 pl-1 group"
+          className="flex items-center gap-2.5 cursor-pointer shrink-0 group"
         >
-          <div className="relative">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-pinkBrand-500 to-blue-600 p-0.5 shadow-md group-hover:scale-105 transition-transform flex items-center justify-center">
-              <div className="w-full h-full bg-white dark:bg-slate-900 rounded-[14px] flex items-center justify-center overflow-hidden">
-                <img 
-                  src="/images/avatar_co_mung.jpg" 
-                  alt="ETA Mascot" 
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLElement).style.display = 'none';
-                  }}
-                />
-                <span className="text-lg font-black bg-gradient-to-r from-blue-600 to-amber-500 bg-clip-text text-transparent">
-                  ETA
-                </span>
-              </div>
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#FF5288] via-[#FF7A59] to-[#FFA048] p-0.5 shadow-md group-hover:scale-105 transition-transform flex items-center justify-center">
+            <div className="w-full h-full bg-white dark:bg-slate-900 rounded-[14px] flex items-center justify-center overflow-hidden">
+              <img 
+                src="/images/avatar_co_mung.jpg" 
+                alt="Cô Đỗ Mừng" 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLElement).style.display = 'none';
+                }}
+              />
+              <span className="text-sm font-black text-pinkBrand-600">TIN 6</span>
             </div>
-            {/* Mascot mini badge */}
-            <span className="absolute -bottom-1 -right-1 px-1 py-0.2 rounded-full bg-blue-600 text-[8px] font-black text-white shadow-sm">
-              TIN 6
-            </span>
           </div>
 
           <div className="hidden xl:block">
             <div className="flex items-center gap-1">
-              <span className="text-base font-black tracking-tight text-blue-600 dark:text-blue-400 font-sans">
-                ETA
+              <span className="text-base font-black tracking-tight text-pinkBrand-600 dark:text-pinkBrand-400">
+                CÙNG HỌC TIN 6
               </span>
-              <span className="text-[11px] font-extrabold text-amber-500 uppercase tracking-wider">
-                CHIA SẺ ĐAM MÊ
+              <span className="text-[11px] font-extrabold text-amber-500 uppercase">
+                💖
               </span>
             </div>
-            <div className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">
-              KIẾN THỨC AI GIÁO DỤC 🎀
+            <div className="text-[10px] font-bold text-slate-400">
+              Cô Đỗ Mừng 🌸
             </div>
           </div>
         </div>
 
-        {/* 2. CENTER: Main Navigation Menu (Exact vertical Icon + Text layout matching image) */}
+        {/* 2. CENTER: 8 Exact Categories (Icon on top + Text below) */}
         <div className="flex-1 flex items-center justify-center overflow-x-auto no-scrollbar py-1">
           <div className="flex items-center gap-1 sm:gap-2 md:gap-3 lg:gap-4 px-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
-              const isActive = activeTab === item.id || (item.id === 'lessons' && activeTab === 'lessons');
+              const isActive = activeTab === item.id;
 
               return (
                 <button
                   key={item.id}
                   onClick={() => handleItemClick(item.id)}
-                  className={`relative flex flex-col items-center justify-center min-w-[56px] sm:min-w-[64px] md:min-w-[72px] h-[64px] px-2 rounded-2xl transition-all duration-200 group ${
+                  className={`relative flex flex-col items-center justify-center min-w-[62px] sm:min-w-[70px] md:min-w-[78px] h-[66px] px-2 rounded-2xl transition-all duration-200 group ${
                     isActive
-                      ? 'bg-blue-50/80 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-bold'
+                      ? 'bg-blue-50/90 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 font-bold'
                       : 'text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                   }`}
                 >
-                  {/* VIP Yellow Badge */}
+                  {/* VIP Badge for Trò chơi */}
                   {item.isVip && (
-                    <span className="absolute top-1 right-2 px-1 py-0.2 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 text-[8px] font-black text-white shadow-xs leading-none">
+                    <span className="absolute top-1 right-2.5 px-1 py-0.2 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 text-[8px] font-black text-white shadow-xs leading-none">
                       VIP
                     </span>
                   )}
 
-                  {/* Icon */}
+                  {/* Icon on Top */}
                   <div className="relative mb-1">
                     <Icon className={`w-5 h-5 transition-transform duration-200 group-hover:scale-110 ${
                       isActive ? 'text-blue-600 dark:text-blue-400 stroke-[2.4]' : 'stroke-[1.8]'
                     }`} />
                   </div>
 
-                  {/* Text Label */}
-                  <span className={`text-[11px] leading-tight tracking-tight whitespace-nowrap transition-colors ${
+                  {/* Text Label on Bottom */}
+                  <span className={`text-[11px] sm:text-xs leading-tight tracking-tight whitespace-nowrap transition-colors ${
                     isActive ? 'font-extrabold text-blue-600 dark:text-blue-400' : 'font-semibold'
                   }`}>
                     {item.label}
                   </span>
 
-                  {/* Active bottom blue line highlight (Exact match to image) */}
+                  {/* Active bottom blue line indicator */}
                   {isActive && (
                     <span className="absolute bottom-0 w-8 h-[3px] bg-blue-600 dark:bg-blue-400 rounded-full animate-in fade-in zoom-in-50 duration-200" />
                   )}
@@ -180,29 +177,33 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* 3. RIGHT: Notification Bell & User Login / Profile Pill (Exact match to image) */}
+        {/* 3. RIGHT: Notification Bell & User Login / Profile Pill */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0 pr-1">
           
-          {/* Notification Bell */}
+          {/* 🔔 Notification Bell with Red Dot */}
           <div className="relative">
             <button
               onClick={() => {
                 sound.click();
                 setIsNotifDropdownOpen(!isNotifDropdownOpen);
               }}
+              title="Thông báo từ Cô Đỗ Mừng"
               className="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative"
             >
               <Bell className="w-5 h-5" />
-              {/* Notification Badge */}
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-900" />
+              {/* Red dot alert badge */}
+              <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
             </button>
 
             {/* Notification Dropdown */}
             {isNotifDropdownOpen && (
               <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-[#1A1E33] rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 p-4 z-50 animate-in fade-in slide-in-from-top-2">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-3">
-                  <h4 className="text-xs font-extrabold text-slate-800 dark:text-white">Thông Báo Mới 🔔</h4>
-                  <span className="text-[10px] text-blue-600 font-bold">Đánh dấu đã đọc</span>
+                  <h4 className="text-xs font-extrabold text-slate-800 dark:text-white flex items-center gap-1.5">
+                    <Bell className="w-3.5 h-3.5 text-red-500" />
+                    <span>Thông Báo Từ Cô Đỗ Mừng 🌸</span>
+                  </h4>
+                  <span className="text-[10px] text-blue-600 font-bold">Đã đọc</span>
                 </div>
                 <div className="space-y-2.5">
                   <div className="p-2.5 rounded-2xl bg-blue-50/60 dark:bg-slate-800/40 text-xs">
@@ -226,25 +227,25 @@ export const Navbar: React.FC = () => {
                 className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors"
               >
                 <UserPlus className="w-3.5 h-3.5" />
-                <span>Đăng Ký</span>
+                <span>📝 Đăng Ký</span>
               </button>
 
               <button
                 onClick={() => openAuthModal('teacher_login')}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md transition-all hover:scale-105"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md transition-all hover:scale-105"
               >
                 <LogIn className="w-4 h-4" />
-                <span>Đăng Nhập</span>
+                <span>🔐 Đăng Nhập</span>
               </button>
             </div>
           ) : (
             <div className="relative">
-              {/* Profile Pill matching exact style: (Circle Avatar Initials) + (Full Name) */}
+              {/* User Profile Pill matching exact photo reference: (Circle Avatar Blue with initials) + (Full Name) */}
               <div 
                 onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
                 className="flex items-center gap-2.5 pl-1.5 pr-4 py-1.5 rounded-full border border-slate-200/90 dark:border-slate-700 bg-white dark:bg-[#1A1E33] hover:shadow-md cursor-pointer transition-all select-none group"
               >
-                {/* Circle Avatar with Initials (Exact blue circle with "Hà" as shown in user photo) */}
+                {/* Circle Avatar with Initials (Exact blue circle with "Hà" / "DM" as shown in user photo) */}
                 <div className="w-8 h-8 rounded-full bg-[#0066CC] text-white font-extrabold text-xs flex items-center justify-center shadow-xs shrink-0 overflow-hidden">
                   {currentUser.role === 'teacher' ? (
                     <img 
@@ -260,7 +261,7 @@ export const Navbar: React.FC = () => {
                   )}
                 </div>
 
-                {/* User Short Name (Matching "Hà Khánh" in reference image) */}
+                {/* User Short Name (Matching "Hà Khánh" / "Cô Đỗ Mừng" in reference image) */}
                 <div className="text-left">
                   <div className="text-xs font-extrabold text-slate-800 dark:text-slate-100 leading-none">
                     {getShortName(currentUser.full_name)}
