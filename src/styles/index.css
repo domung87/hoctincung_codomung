@@ -50,12 +50,96 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(108, 93, 211, 0.2);
+  background: rgba(255, 82, 136, 0.25);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(108, 93, 211, 0.4);
+  background: rgba(255, 82, 136, 0.5);
+}
+
+/* ============================================================================
+   1. HIỆU ỨNG TIA SÁNG QUÉT NHẸ (SHIMMER SWEEP MỖI 6 GIÂY)
+   ============================================================================ */
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.8;
+  }
+  30% {
+    transform: translateX(250%) skewX(-20deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(250%) skewX(-20deg);
+    opacity: 0;
+  }
+}
+
+.animate-shimmer-sweep {
+  animation: shimmer-sweep 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* ============================================================================
+   4. HIỆU ỨNG ÁNH SAO ĐÊM & BỤI NẮNG NGÀY (DAY / NIGHT PARTICLES)
+   ============================================================================ */
+@keyframes star-twinkle {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+.animate-star-twinkle {
+  animation: star-twinkle 2.5s ease-in-out infinite;
+}
+
+@keyframes sunbeam-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(-8px) rotate(8deg);
+    opacity: 0.85;
+  }
+}
+
+.animate-sunbeam-float {
+  animation: sunbeam-float 4s ease-in-out infinite;
+}
+
+/* ============================================================================
+   5. HIỆU ỨNG 3D MASCOT VẪY TAY CHÀO (WAVING HAND & 3D TILT)
+   ============================================================================ */
+@keyframes wave-hand {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(14deg);
+  }
+  40% {
+    transform: rotate(-8deg);
+  }
+  60% {
+    transform: rotate(14deg);
+  }
+  80% {
+    transform: rotate(-4deg);
+  }
+}
+
+.animate-wave-hand {
+  animation: wave-hand 1.4s ease-in-out infinite;
+  transform-origin: 70% 70%;
 }
 
 /* Pulsing Live Dot */
