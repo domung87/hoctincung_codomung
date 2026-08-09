@@ -101,6 +101,37 @@ class SoundEffects {
       });
     } catch (e) {}
   }
+
+  // 1. Welcome Jingle: Marimba / Harp cheerful musical chime
+  welcomeJingle() {
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const jingleNotes = [
+        { f: 523.25, d: 0.12 }, // C5
+        { f: 659.25, d: 0.12 }, // E5
+        { f: 783.99, d: 0.14 }, // G5
+        { f: 987.77, d: 0.14 }, // B5
+        { f: 1046.50, d: 0.18 }, // C6
+        { f: 1318.51, d: 0.45 }  // E6 (final sweet ring)
+      ];
+      let t = this.ctx.currentTime + 0.05;
+      jingleNotes.forEach(item => {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(item.f, t);
+        gain.gain.setValueAtTime(0.18, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + item.d);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + item.d);
+        t += item.d * 0.85;
+      });
+    } catch (e) {}
+  }
 }
 
 export const sound = new SoundEffects();
