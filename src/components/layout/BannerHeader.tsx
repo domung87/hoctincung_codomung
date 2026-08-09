@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Volume2, 
   Sparkles, 
@@ -12,12 +12,14 @@ import {
   ZoomOut, 
   RotateCcw,
   Music,
-  ThumbsUp,
-  Gift,
-  Smile,
-  Calendar,
-  Sparkle,
-  Award
+  Laptop,
+  BookOpen,
+  Code2,
+  Cpu,
+  Wifi,
+  Lightbulb,
+  Zap,
+  GraduationCap
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../../context/AppContext';
@@ -46,7 +48,7 @@ export const BannerHeader: React.FC = () => {
   // 4. Feature: Like Banner with Mini Confetti Fireworks
   const [likesCount, setLikesCount] = useState<number>(() => {
     const saved = localStorage.getItem('tinhoc6_banner_likes');
-    return saved ? parseInt(saved, 10) : 568;
+    return saved ? parseInt(saved, 10) : 620;
   });
   const [hasLiked, setHasLiked] = useState<boolean>(false);
 
@@ -76,7 +78,7 @@ export const BannerHeader: React.FC = () => {
   const [foundEggs, setFoundEggs] = useState<number[]>([]);
   const [isEasterEggModalOpen, setIsEasterEggModalOpen] = useState<boolean>(false);
 
-  // Play Welcome Jingle on first user click anywhere on banner
+  // Play Welcome Jingle
   const handlePlayJingle = (e: React.MouseEvent) => {
     e.stopPropagation();
     sound.welcomeJingle();
@@ -92,7 +94,6 @@ export const BannerHeader: React.FC = () => {
       setHasLiked(true);
       localStorage.setItem('tinhoc6_banner_likes', newCount.toString());
 
-      // Mini Fireworks Sparks (Tia lửa tim hồng & sao vàng)
       confetti({
         particleCount: 45,
         spread: 60,
@@ -112,7 +113,6 @@ export const BannerHeader: React.FC = () => {
     setFoundEggs(updated);
 
     if (updated.length === 3) {
-      // Unlocked all 3 Easter Eggs!
       sound.victory();
       addCoins(100);
       addXP(50, 'Mở khóa Trứng Phục Sinh bí mật');
@@ -138,7 +138,7 @@ export const BannerHeader: React.FC = () => {
     sound.victory();
     const link = document.createElement('a');
     link.href = '/images/banner_tin6_real.png';
-    link.download = 'Hoc_Tin_Cung_Co_Do_Mung_Wallpaper_FullHD.png';
+    link.download = 'Hoc_Tin_Hoc_Cung_Co_Do_Mung_Wallpaper_FullHD.png';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -159,41 +159,89 @@ export const BannerHeader: React.FC = () => {
     setIsZoomModalOpen(true);
   };
 
-  // Season Meta Info
-  const seasonMeta = {
-    school: { label: 'Mùa Tựu Trường 🎒', icon: '🎒', badgeBg: 'bg-blue-500 text-white' },
-    tet: { label: 'Mùa Xuân / Tết 🌸', icon: '🧧', badgeBg: 'bg-red-500 text-white' },
-    summer: { label: 'Mùa Hè Sôi Động ☀️', icon: '🪷', badgeBg: 'bg-emerald-500 text-white' },
-    autumn: { label: 'Mùa Thu Khai Trường 🍁', icon: '🍁', badgeBg: 'bg-amber-500 text-white' }
-  };
-
   return (
     <div className="w-full select-none relative overflow-hidden bg-gradient-to-r from-[#FF5E82] via-[#FF7A57] to-[#FFA53B]">
       
       {/* =========================================================================
-          MAIN BANNER CONTAINER (Kéo dài tràn viền 100% Full-Width)
+          MAIN BANNER CONTAINER (Kéo dài vừa khít tràn viền 100% chuẩn 16:2)
           ========================================================================= */}
       <div 
         onClick={handleOpenZoomModal}
-        className={`relative w-full aspect-[16/4] sm:aspect-[16/2.8] md:aspect-[16/2] min-h-[140px] max-h-[220px] overflow-hidden cursor-pointer transition-all duration-700 group border-b-2 ${
+        className={`relative w-full aspect-[16/4.5] sm:aspect-[16/3] md:aspect-[16/2] min-h-[145px] max-h-[225px] overflow-hidden cursor-pointer transition-all duration-700 group border-b-2 ${
           isDayTime
-            ? 'border-pink-200/80 bg-gradient-to-r from-[#FF5E82] via-[#FF7A57] to-[#FFA53B]'
+            ? 'border-pink-200/90 bg-gradient-to-r from-[#FF5E82] via-[#FF7A57] to-[#FFA53B]'
             : 'border-indigo-400/80 bg-gradient-to-r from-[#2A0845] via-[#6441A5] to-[#FF4E50]'
         }`}
       >
         
-        {/* Bức hình Banner 3D mới sắc nét 100% */}
+        {/* LỚP 1: Bức hình nền 3D nghệ thuật sắc nét */}
         <img
           src="/images/banner_tin6_real.png"
-          alt="HỌC TIN CÙNG CÔ ĐỖ MỪNG"
-          className="w-full h-full object-cover object-center block transition-transform duration-500 group-hover:scale-[1.008]"
+          alt="HỌC TIN HỌC CÙNG CÔ ĐỖ MỪNG"
+          className="w-full h-full object-cover object-center block transition-transform duration-500 group-hover:scale-[1.006]"
           style={{ imageRendering: 'auto' }}
         />
+
+        {/* LỚP 2: KHỐI TYPOGRAPHY 3D SIÊU NÉT Ở GIỮA & CÁC ICON CÔNG NGHỆ BỔ TRỢ */}
+        <div className="absolute inset-0 flex items-center justify-between px-4 sm:px-10 lg:px-16 pointer-events-none z-10">
+          
+          {/* Cụm Bên Trái: Cô Giáo Cute AI & Bút Thần Kỳ */}
+          <div className="flex items-center gap-3 opacity-90 hidden sm:flex">
+            <div className="p-2 rounded-2xl bg-white/20 backdrop-blur-md border border-white/40 shadow-lg animate-pulse-dot">
+              <span className="text-xl sm:text-2xl">👩‍🏫</span>
+            </div>
+            <div className="hidden lg:block text-left text-white drop-shadow-md">
+              <div className="text-[11px] font-black tracking-wider uppercase opacity-90">Cô Giáo AI 3D</div>
+              <div className="text-xs font-black text-yellow-200">Cô Đỗ Mừng 💖</div>
+            </div>
+          </div>
+
+          {/* Cụm Ở Giữa: DÒNG CHỮ CHÍNH "HỌC TIN HỌC CÙNG CÔ ĐỖ MỪNG" 3D SIÊU RÕ NÉT */}
+          <div className="flex-1 flex flex-col items-center justify-center text-center space-y-1 sm:space-y-1.5 px-2">
+            
+            {/* Top Ribbon Badge: Thương hiệu & Khẩu hiệu */}
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-0.5 sm:py-1 rounded-full bg-white/95 text-[#FF5288] text-[10px] sm:text-xs font-black shadow-lg border border-pink-200 backdrop-blur-md transform -translate-y-0.5">
+              <Sparkles className="w-3 h-3 text-amber-500 fill-amber-500" />
+              <span>HỌC VUI • HIỂU NHANH • LÀM GIỎI</span>
+              <Sparkles className="w-3 h-3 text-amber-500 fill-amber-500" />
+            </div>
+
+            {/* Dòng Chữ 3D Lớn: HỌC TIN HỌC CÙNG CÔ ĐỖ MỪNG */}
+            <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-[40px] font-black text-white tracking-tight leading-none drop-shadow-[0_4px_12px_rgba(0,0,0,0.45)] flex items-center justify-center gap-2">
+              <span className="bg-gradient-to-b from-white via-pink-100 to-amber-200 bg-clip-text text-transparent filter drop-shadow-md">
+                HỌC TIN HỌC CÙNG CÔ ĐỖ MỪNG
+              </span>
+            </h1>
+
+            {/* Bottom Sub-tag Sách Kết Nối Tri Thức */}
+            <div className="hidden sm:flex items-center gap-2 text-white/95 text-[11px] sm:text-xs font-extrabold drop-shadow-md">
+              <span className="px-2.5 py-0.5 rounded-full bg-black/25 backdrop-blur-xs border border-white/30 flex items-center gap-1">
+                <BookOpen className="w-3 h-3 text-yellow-300" />
+                <span>Tin Học 6 • Kết Nối Tri Thức Với Cuộc Sống</span>
+              </span>
+            </div>
+
+          </div>
+
+          {/* Cụm Bên Phải: Các Icon Sách Vở & Công Nghệ 3D Sắc Nét */}
+          <div className="flex items-center gap-2.5 opacity-90 hidden sm:flex">
+            <div className="p-2 rounded-2xl bg-white/20 backdrop-blur-md border border-white/40 shadow-lg flex items-center gap-1.5 text-white">
+              <Laptop className="w-4 h-4 text-cyan-200" />
+              <Code2 className="w-4 h-4 text-yellow-200" />
+              <Cpu className="w-4 h-4 text-emerald-200" />
+            </div>
+            <div className="hidden lg:block text-right text-white drop-shadow-md">
+              <div className="text-[11px] font-black tracking-wider uppercase opacity-90">Công Nghệ & AI</div>
+              <div className="text-xs font-black text-cyan-200">Python • THCS 💻</div>
+            </div>
+          </div>
+
+        </div>
 
         {/* =======================================================================
             1. HIỆU ỨNG TIA SÁNG QUÉT NHẸ (SHIMMER SWEEP MỖI 6 GIÂY)
             ======================================================================= */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
           <div className="w-1/3 h-[250%] bg-gradient-to-r from-transparent via-white/40 to-transparent absolute -top-1/2 left-0 animate-shimmer-sweep pointer-events-none" />
         </div>
 
@@ -220,29 +268,26 @@ export const BannerHeader: React.FC = () => {
         {/* =======================================================================
             5. EASTER EGG SECRET TARGETS (3 ĐIỂM BÍ MẬT ẨN TRÊN BANNER)
             ======================================================================= */}
-        {/* Điểm 1: Chiếc laptop coder bên phải */}
         <div 
           onClick={(e) => handleEggClick(e, 1)}
           title="Bí mật 1: Chiếc Laptop Coder"
-          className="absolute top-3 right-[18%] w-8 h-8 rounded-full cursor-pointer z-20 hover:ring-2 hover:ring-yellow-300/60 transition-all opacity-0 hover:opacity-100 flex items-center justify-center text-xs bg-black/20 backdrop-blur-xs"
+          className="absolute top-3 right-[18%] w-8 h-8 rounded-full cursor-pointer z-30 hover:ring-2 hover:ring-yellow-300/60 transition-all opacity-0 hover:opacity-100 flex items-center justify-center text-xs bg-black/20 backdrop-blur-xs"
         >
           {foundEggs.includes(1) ? '✅' : '❓'}
         </div>
 
-        {/* Điểm 2: Cuốn sách Tin Học bên góc dưới phải */}
         <div 
           onClick={(e) => handleEggClick(e, 2)}
           title="Bí mật 2: Sách Tin Học THCS"
-          className="absolute bottom-4 right-[12%] w-8 h-8 rounded-full cursor-pointer z-20 hover:ring-2 hover:ring-yellow-300/60 transition-all opacity-0 hover:opacity-100 flex items-center justify-center text-xs bg-black/20 backdrop-blur-xs"
+          className="absolute bottom-4 right-[12%] w-8 h-8 rounded-full cursor-pointer z-30 hover:ring-2 hover:ring-yellow-300/60 transition-all opacity-0 hover:opacity-100 flex items-center justify-center text-xs bg-black/20 backdrop-blur-xs"
         >
           {foundEggs.includes(2) ? '✅' : '❓'}
         </div>
 
-        {/* Điểm 3: Biểu tượng cây bút chỉ bảng của Cô Đỗ Mừng */}
         <div 
           onClick={(e) => handleEggClick(e, 3)}
           title="Bí mật 3: Cây Bút Chỉ Bảng Thần Kỳ"
-          className="absolute top-[28%] left-[22%] w-8 h-8 rounded-full cursor-pointer z-20 hover:ring-2 hover:ring-yellow-300/60 transition-all opacity-0 hover:opacity-100 flex items-center justify-center text-xs bg-black/20 backdrop-blur-xs"
+          className="absolute top-[28%] left-[22%] w-8 h-8 rounded-full cursor-pointer z-30 hover:ring-2 hover:ring-yellow-300/60 transition-all opacity-0 hover:opacity-100 flex items-center justify-center text-xs bg-black/20 backdrop-blur-xs"
         >
           {foundEggs.includes(3) ? '✅' : '❓'}
         </div>
@@ -250,7 +295,7 @@ export const BannerHeader: React.FC = () => {
         {/* =======================================================================
             BOTTOM-LEFT TOOLBAR: MASCOT VẪY TAY + NHẠC CHÀO MỪNG + NÚT THÍCH
             ======================================================================= */}
-        <div className="absolute bottom-3 left-4 sm:bottom-4 sm:left-8 z-20 flex items-center gap-2 flex-wrap">
+        <div className="absolute bottom-3 left-4 sm:bottom-4 sm:left-8 z-30 flex items-center gap-2 flex-wrap">
           
           {/* 3D Mascot Interactive Voice Greeting Button */}
           <div 
@@ -271,7 +316,7 @@ export const BannerHeader: React.FC = () => {
             </span>
           </div>
 
-          {/* 1. Nút Phát Nhạc Chuông Chào Mừng (Welcome Jingle) */}
+          {/* Nút Phát Nhạc Chuông Chào Mừng (Welcome Jingle) */}
           <button
             onClick={handlePlayJingle}
             title="Nghe nhạc chuông vui tai chào mừng"
@@ -281,7 +326,7 @@ export const BannerHeader: React.FC = () => {
             <span className="hidden sm:inline">Nhạc Chào Mừng 🎶</span>
           </button>
 
-          {/* 2. Nút Thích (Like) Banner kèm Pháo Hoa Mini */}
+          {/* Nút Thích (Like) Banner kèm Pháo Hoa Mini */}
           <button
             onClick={handleLikeBanner}
             title="Thích banner để bắn pháo hoa mini lấp lánh!"
@@ -305,7 +350,7 @@ export const BannerHeader: React.FC = () => {
         </div>
 
         {/* =======================================================================
-            TOP-LEFT / CENTER TICKER: 3. LỜI CHÚC & CHÂM NGÔN HỌC TẬP MỖI NGÀY
+            TOP-LEFT TICKER: LỜI CHÚC & CHÂM NGÔN HỌC TẬP MỖI NGÀY
             ======================================================================= */}
         <div 
           onClick={(e) => {
@@ -314,12 +359,12 @@ export const BannerHeader: React.FC = () => {
             setQuoteIndex((prev) => (prev + 1) % dailyQuotes.length);
           }}
           title="Bấm để xem câu châm ngôn học tập tiếp theo"
-          className="hidden md:flex absolute top-3 left-4 sm:top-4 sm:left-8 z-20 items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 hover:bg-white text-slate-800 backdrop-blur-md shadow-md border border-pink-200 text-[11px] font-bold cursor-pointer transition-all hover:scale-102"
+          className="hidden md:flex absolute top-3 left-4 sm:top-4 sm:left-8 z-30 items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 hover:bg-white text-slate-800 backdrop-blur-md shadow-md border border-pink-200 text-[11px] font-bold cursor-pointer transition-all hover:scale-102"
         >
           <span className="px-2 py-0.5 rounded-md bg-pink-100 text-pinkBrand-600 font-black text-[10px]">
             {dailyQuotes[quoteIndex].day} {dailyQuotes[quoteIndex].icon}
           </span>
-          <span className="text-slate-700 font-medium truncate max-w-sm lg:max-w-md">
+          <span className="text-slate-700 font-medium truncate max-w-xs lg:max-w-sm">
             "{dailyQuotes[quoteIndex].text}"
           </span>
           <span className="text-[10px] text-pinkBrand-500 font-bold ml-1">🎲 Đổi câu</span>
@@ -328,9 +373,9 @@ export const BannerHeader: React.FC = () => {
         {/* =======================================================================
             TOP RIGHT TOOLBAR: (MÙA LỄ HỘI + NGÀY/ĐÊM + DOWNLOAD HD + ZOOM FULL HD)
             ======================================================================= */}
-        <div className="absolute top-3 right-4 sm:top-4 sm:right-8 z-20 flex items-center gap-1.5 sm:gap-2">
+        <div className="absolute top-3 right-4 sm:top-4 sm:right-8 z-30 flex items-center gap-1.5 sm:gap-2">
           
-          {/* 4. Bộ Chọn Mùa Lễ Hội (Mùa Tựu Trường / Tết / Hè / Thu) */}
+          {/* Bộ Chọn Mùa Lễ Hội (Mùa Tựu Trường / Tết / Hè / Thu) */}
           <select
             onClick={(e) => e.stopPropagation()}
             value={currentSeason}
@@ -410,7 +455,7 @@ export const BannerHeader: React.FC = () => {
               <div className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-yellow-300 fill-yellow-300" />
                 <h3 className="text-sm sm:text-base font-black">
-                  BỨC TRANH 3D NGHỆ THUẬT: HỌC TIN CÙNG CÔ ĐỖ MỪNG (FULL HD)
+                  BỨC TRANH 3D NGHỆ THUẬT: HỌC TIN HỌC CÙNG CÔ ĐỖ MỪNG (FULL HD)
                 </h3>
               </div>
 
@@ -449,7 +494,7 @@ export const BannerHeader: React.FC = () => {
             <div className="p-4 sm:p-6 bg-slate-950 flex items-center justify-center overflow-auto max-h-[75vh]">
               <img
                 src="/images/banner_tin6_real.png"
-                alt="HỌC TIN CÙNG CÔ ĐỖ MỪNG FULL HD"
+                alt="HỌC TIN HỌC CÙNG CÔ ĐỖ MỪNG FULL HD"
                 className="max-w-full h-auto rounded-2xl shadow-2xl transition-transform duration-300 select-none cursor-grab"
                 style={{ transform: `scale(${zoomScale})` }}
               />
