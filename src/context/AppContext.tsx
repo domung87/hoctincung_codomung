@@ -14,6 +14,12 @@ import {
   INITIAL_SUBMISSIONS, 
   INITIAL_NOTIFICATIONS 
 } from '../lib/mockData';
+import { 
+  fetchTopicsFromSupabase, 
+  fetchQuestionsFromSupabase, 
+  saveSubmissionToSupabase,
+  getSupabaseConfig 
+} from '../lib/supabase';
 import { sound } from '../lib/soundFx';
 
 interface AppContextType {
@@ -32,6 +38,12 @@ interface AppContextType {
   playCoDoMungGreeting: () => void;
   isGreetingModalOpen: boolean;
   setIsGreetingModalOpen: (open: boolean) => void;
+
+  // Supabase Configuration
+  isSupabaseConfigOpen: boolean;
+  setIsSupabaseConfigOpen: (open: boolean) => void;
+  isLiveSupabase: boolean;
+  refreshDataFromSupabase: () => Promise<void>;
 
   // Modals
   isPracticeModalOpen: boolean;
@@ -69,7 +81,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isPracticeModalOpen, setIsPracticeModalOpen] = useState<boolean>(false);
   const [isQuizModalOpen, setIsQuizModalOpen] = useState<boolean>(false);
   const [isAssignmentModalOpen, setIsAssignmentModalOpen] = useState<boolean>(false);
+  const [isSupabaseConfigOpen, setIsSupabaseConfigOpen] = useState<boolean>(false);
   const [activeAssignment, setActiveAssignment] = useState<Assignment | null>(null);
+
+  const [isLiveSupabase, setIsLiveSupabase] = useState<boolean>(() => {
+    return getSupabaseConfig().isLive;
+  });
+
+  // Load from Supabase on mount
+  const refreshDataFromSupabase = async () => {
+    const config = getSupabaseConfig();
+    setIsLiveSupabase(config.isLive);
+    if (config.isLive) {
+      const [liveTopics, liveQuestions] = await Promise.all([
+        fetchTopicsFromSupabase(),
+        fetchQuestionsFromSupabase()
+      ]);
+      setTopics(liveTopics);
+      setQuestions(liveQuestions);
+    }
+  };
+
+  useEffect(() => {
+    refreshDataFromSupabase();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('tinhoc6_topics', JSON.stringify(topics));
@@ -108,7 +143,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     })));
   };
 
-  const submitAssignment = (assignmentId: string, content: string, studentId: string, studentName: string, studentAvatar: string) => {
+  const submitAssignment = async (assignmentId: string, content: string, studentId: string, studentName: string, studentAvatar: string) => {
     const assign = assignments.find(a => a.id === assignmentId);
     const newSub: Submission = {
       id: 'sub-' + Date.now(),
@@ -126,6 +161,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
     setSubmissions(prev => [newSub, ...prev]);
     sound.correct();
+
+    // Async sync to Supabase
+    saveSubmissionToSupabase(newSub);
   };
 
   const gradeSubmission = (submissionId: string, score: number, feedback: string) => {
@@ -159,6 +197,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setIsQuizModalOpen,
       isAssignmentModalOpen,
       setIsAssignmentModalOpen,
+      isSupabaseConfigOpen,
+      setIsSupabaseConfigOpen,
+      isLiveSupabase,
+      refreshDataFromSupabase,
       activeAssignment,
       setActiveAssignment,
       toggleCompleteLesson,

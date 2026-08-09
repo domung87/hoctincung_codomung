@@ -10,11 +10,17 @@ import { StatsView } from './components/views/StatsView';
 import { GreetingModal } from './components/modals/GreetingModal';
 import { PracticeModal } from './components/modals/PracticeModal';
 import { QuizModal } from './components/modals/QuizModal';
+import { SupabaseConfigModal } from './components/modals/SupabaseConfigModal';
 
 import { useApp } from './context/AppContext';
 
 export const App: React.FC = () => {
-  const { activeTab } = useApp();
+  const { 
+    activeTab, 
+    isSupabaseConfigOpen, 
+    setIsSupabaseConfigOpen, 
+    refreshDataFromSupabase 
+  } = useApp();
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FFF5F7] dark:bg-[#0B0D17] text-slate-800 dark:text-slate-100 transition-colors duration-200">
@@ -45,6 +51,11 @@ export const App: React.FC = () => {
       <GreetingModal />
       <PracticeModal />
       <QuizModal />
+      <SupabaseConfigModal
+        isOpen={isSupabaseConfigOpen}
+        onClose={() => setIsSupabaseConfigOpen(false)}
+        onConfigSaved={refreshDataFromSupabase}
+      />
     </div>
   );
 };

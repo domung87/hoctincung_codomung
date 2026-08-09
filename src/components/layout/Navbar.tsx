@@ -7,7 +7,9 @@ import {
   BarChart3, 
   UserCheck, 
   ChevronDown,
-  Laptop
+  Laptop,
+  Database,
+  ShieldCheck
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
@@ -19,7 +21,9 @@ export const Navbar: React.FC = () => {
     activeTab, 
     setActiveTab, 
     setIsPracticeModalOpen, 
-    setIsQuizModalOpen 
+    setIsQuizModalOpen,
+    setIsSupabaseConfigOpen,
+    isLiveSupabase
   } = useApp();
   
   const { currentUser, switchRole } = useAuth();
@@ -114,6 +118,27 @@ export const Navbar: React.FC = () => {
           >
             <BarChart3 className="w-4 h-4 text-emerald-500" />
             <span>Thống Kê</span>
+          </button>
+
+          {/* Supabase Config Button */}
+          <button
+            onClick={() => {
+              sound.click();
+              setIsSupabaseConfigOpen(true);
+            }}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-extrabold transition-all border ${
+              isLiveSupabase 
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300' 
+                : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700'
+            }`}
+          >
+            <Database className="w-3.5 h-3.5 text-emerald-500" />
+            <span className="hidden sm:inline">Supabase DB</span>
+            {isLiveSupabase ? (
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            ) : (
+              <span className="text-[10px] text-slate-400">Kết nối</span>
+            )}
           </button>
 
           {/* Role Switcher Button */}
