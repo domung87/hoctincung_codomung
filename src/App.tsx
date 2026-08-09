@@ -5,6 +5,7 @@ import { LessonSidebar } from './components/lesson/LessonSidebar';
 import { LessonContent } from './components/lesson/LessonContent';
 import { HomeOverview } from './components/views/HomeOverview';
 import { StatsView } from './components/views/StatsView';
+import { SpecialTabsView } from './components/views/SpecialTabsView';
 
 // Modals
 import { GreetingModal } from './components/modals/GreetingModal';
@@ -23,16 +24,18 @@ export const App: React.FC = () => {
     refreshDataFromSupabase 
   } = useApp();
 
+  const isSpecialTab = ['council', 'news', 'library', 'tech_market', 'market', 'agency'].includes(activeTab);
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFF5F7] dark:bg-[#0B0D17] text-slate-800 dark:text-slate-100 transition-colors duration-200">
+    <div className="min-h-screen flex flex-col bg-[#F7F9FC] dark:bg-[#0B0D17] text-slate-800 dark:text-slate-100 transition-colors duration-200">
       {/* 1. Top Colorful Banner with "CÙNG HỌC TIN 6 VỚI CÔ ĐỖ MỪNG" */}
       <BannerHeader />
 
-      {/* 2. Navigation Bar with Top-Right Auth Buttons */}
+      {/* 2. Horizontal Navigation Bar with Mascot Logo & Top-Right Auth (Exact match to reference image) */}
       <Navbar />
 
       {/* 3. Main Body Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6">
+      <main className="flex-1 max-w-[1440px] w-full mx-auto p-4 md:p-6">
         {activeTab === 'home' && <HomeOverview />}
 
         {activeTab === 'lessons' && (
@@ -46,6 +49,8 @@ export const App: React.FC = () => {
         )}
 
         {activeTab === 'stats' && <StatsView />}
+
+        {isSpecialTab && <SpecialTabsView />}
       </main>
 
       {/* Interactive Modals */}
