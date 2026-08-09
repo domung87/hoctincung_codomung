@@ -14,7 +14,9 @@ import {
   UserPlus, 
   ChevronDown,
   ShieldCheck,
-  Sparkles
+  Sparkles,
+  Radio,
+  Music
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
@@ -40,21 +42,23 @@ export const Navbar: React.FC = () => {
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isNotifDropdownOpen, setIsNotifDropdownOpen] = useState(false);
 
-  // 8 Exact Categories matching user's specification:
+  // Categories list:
   // 1. 🏠 Trang chủ
-  // 2. 📖 Thư viện (Kho tài liệu SGK PDF, Sơ đồ tư duy, Đề cương ôn tập)
-  // 3. 🎮 Bài Học (khu vực chứa các bài học)
-  // 4. 🎓 Luyện tập (chứa các bài luyện tập)
-  // 5. 👑 Trò chơi (chứa các trò chơi liên quan đến bài học)
-  // 6. 📰 Bảng tin (Tin tức công nghệ, AI giáo dục và thông báo học tập)
-  // 7. 🎁 Quà tặng (Quà tặng điểm danh chuyên cần mỗi ngày)
-  // 8. 🏆 Vinh danh (Bảng vàng học sinh tiêu biểu & Thống kê điểm số lớp học)
+  // 2. 📖 Thư viện
+  // 3. 🎮 Bài Học
+  // 4. 🎓 Luyện tập
+  // 5. 👑 Trò chơi
+  // 6. 📻 Giải trí (Âm nhạc & Truyện kể)
+  // 7. 📰 Bảng tin
+  // 8. 🎁 Quà tặng
+  // 9. 🏆 Vinh danh
   const menuItems = [
     { id: 'home', label: 'Trang chủ', icon: Home, isVip: false },
     { id: 'library', label: 'Thư viện', icon: BookOpen, isVip: false },
     { id: 'lessons', label: 'Bài Học', icon: Gamepad2, isVip: false },
     { id: 'practice', label: 'Luyện tập', icon: GraduationCap, isVip: false },
     { id: 'games', label: 'Trò chơi', icon: Crown, isVip: true },
+    { id: 'entertainment', label: 'Giải trí', icon: Radio, isVip: false },
     { id: 'news', label: 'Bảng tin', icon: Newspaper, isVip: false },
     { id: 'gifts', label: 'Quà tặng', icon: Gift, isVip: false },
     { id: 'stats', label: 'Vinh danh', icon: Trophy, isVip: false },
@@ -70,7 +74,6 @@ export const Navbar: React.FC = () => {
     }
   };
 
-  // Get first 2 letters of full name for avatar circle initials
   const getInitials = (name: string) => {
     const parts = name.trim().split(' ');
     if (parts.length >= 2) {
@@ -79,7 +82,6 @@ export const Navbar: React.FC = () => {
     return name.slice(0, 2).toUpperCase();
   };
 
-  // Format short name for user pill
   const getShortName = (name: string) => {
     const parts = name.trim().split(' ');
     if (parts.length >= 2) {
@@ -90,7 +92,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <header className="w-full bg-white dark:bg-[#151828] border-b border-slate-200 dark:border-slate-800 shadow-xs sticky top-0 z-40 transition-colors select-none">
-      <div className="max-w-[1440px] mx-auto px-3 sm:px-6 h-[76px] flex items-center justify-between gap-3 lg:gap-6">
+      <div className="max-w-[1440px] mx-auto px-3 sm:px-6 h-[76px] flex items-center justify-between gap-2 lg:gap-4">
         
         {/* 1. LEFT: Brand Icon / Mascot */}
         <div 
@@ -105,7 +107,7 @@ export const Navbar: React.FC = () => {
               <img 
                 src="/images/avatar_co_mung.jpg" 
                 alt="Cô Đỗ Mừng" 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover" 
                 onError={(e) => {
                   (e.target as HTMLElement).style.display = 'none';
                 }}
@@ -114,7 +116,7 @@ export const Navbar: React.FC = () => {
             </div>
           </div>
 
-          <div className="hidden xl:block">
+          <div className="hidden 2xl:block">
             <div className="flex items-center gap-1">
               <span className="text-base font-black tracking-tight text-pinkBrand-600 dark:text-pinkBrand-400">
                 CÙNG HỌC TIN 6
@@ -129,9 +131,9 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* 2. CENTER: 8 Exact Categories (Icon on top + Text below) */}
+        {/* 2. CENTER: Categories (Icon on top + Text below) */}
         <div className="flex-1 flex items-center justify-center overflow-x-auto no-scrollbar py-1">
-          <div className="flex items-center gap-1 sm:gap-2 md:gap-3 lg:gap-4 px-2">
+          <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 lg:gap-3 px-1">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -140,16 +142,23 @@ export const Navbar: React.FC = () => {
                 <button
                   key={item.id}
                   onClick={() => handleItemClick(item.id)}
-                  className={`relative flex flex-col items-center justify-center min-w-[62px] sm:min-w-[70px] md:min-w-[78px] h-[66px] px-2 rounded-2xl transition-all duration-200 group ${
+                  className={`relative flex flex-col items-center justify-center min-w-[58px] sm:min-w-[66px] md:min-w-[72px] h-[66px] px-1.5 rounded-2xl transition-all duration-200 group ${
                     isActive
-                      ? 'bg-blue-50/90 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 font-bold'
+                      ? 'bg-blue-50/90 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 font-bold shadow-xs'
                       : 'text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                   }`}
                 >
                   {/* VIP Badge for Trò chơi */}
                   {item.isVip && (
-                    <span className="absolute top-1 right-2.5 px-1 py-0.2 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 text-[8px] font-black text-white shadow-xs leading-none">
+                    <span className="absolute top-1 right-2 px-1 py-0.2 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 text-[8px] font-black text-white shadow-xs leading-none">
                       VIP
+                    </span>
+                  )}
+
+                  {/* Hot Badge for Giải trí */}
+                  {item.id === 'entertainment' && (
+                    <span className="absolute top-1 right-1 px-1 py-0.2 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-[8px] font-black text-white shadow-xs leading-none">
+                      HOT
                     </span>
                   )}
 
@@ -167,9 +176,9 @@ export const Navbar: React.FC = () => {
                     {item.label}
                   </span>
 
-                  {/* Active bottom blue line indicator */}
+                  {/* Active bottom line indicator */}
                   {isActive && (
-                    <span className="absolute bottom-0 w-8 h-[3px] bg-blue-600 dark:bg-blue-400 rounded-full animate-in fade-in zoom-in-50 duration-200" />
+                    <span className="absolute bottom-0 w-7 h-[3px] bg-blue-600 dark:bg-blue-400 rounded-full animate-in fade-in zoom-in-50 duration-200" />
                   )}
                 </button>
               );
@@ -180,7 +189,7 @@ export const Navbar: React.FC = () => {
         {/* 3. RIGHT: Notification Bell & User Login / Profile Pill */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0 pr-1">
           
-          {/* 🔔 Notification Bell with Red Dot */}
+          {/* Notification Bell with Red Dot */}
           <div className="relative">
             <button
               onClick={() => {
@@ -191,11 +200,9 @@ export const Navbar: React.FC = () => {
               className="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative"
             >
               <Bell className="w-5 h-5" />
-              {/* Red dot alert badge */}
               <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
             </button>
 
-            {/* Notification Dropdown */}
             {isNotifDropdownOpen && (
               <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-[#1A1E33] rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 p-4 z-50 animate-in fade-in slide-in-from-top-2">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-3">
@@ -206,13 +213,13 @@ export const Navbar: React.FC = () => {
                   <span className="text-[10px] text-blue-600 font-bold">Đã đọc</span>
                 </div>
                 <div className="space-y-2.5">
+                  <div className="p-2.5 rounded-2xl bg-purple-50/60 dark:bg-slate-800/40 text-xs">
+                    <p className="font-bold text-slate-800 dark:text-white">📻 Mới: Góc Giải Trí Âm Nhạc & Truyện Kể!</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Vừa nghe nhạc Lo-Fi thư giãn vừa đọc những mẩu chuyện công nghệ kỳ thú nhé các em.</p>
+                  </div>
                   <div className="p-2.5 rounded-2xl bg-blue-50/60 dark:bg-slate-800/40 text-xs">
                     <p className="font-bold text-slate-800 dark:text-white">🌸 Chào mừng em đến với Cùng Học Tin 6!</p>
                     <p className="text-[11px] text-slate-500 mt-0.5">Cô Đỗ Mừng chúc em có những giờ học thật vui và bổ ích.</p>
-                  </div>
-                  <div className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 text-xs">
-                    <p className="font-bold text-slate-800 dark:text-white">🏆 Bảng vàng tuần này đã được cập nhật!</p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Hãy vào mục Vinh danh để xem thứ hạng của lớp mình nhé.</p>
                   </div>
                 </div>
               </div>
@@ -240,12 +247,10 @@ export const Navbar: React.FC = () => {
             </div>
           ) : (
             <div className="relative">
-              {/* User Profile Pill matching exact photo reference: (Circle Avatar Blue with initials) + (Full Name) */}
               <div 
                 onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
                 className="flex items-center gap-2.5 pl-1.5 pr-4 py-1.5 rounded-full border border-slate-200/90 dark:border-slate-700 bg-white dark:bg-[#1A1E33] hover:shadow-md cursor-pointer transition-all select-none group"
               >
-                {/* Circle Avatar with Initials (Exact blue circle with "Hà" / "DM" as shown in user photo) */}
                 <div className="w-8 h-8 rounded-full bg-[#0066CC] text-white font-extrabold text-xs flex items-center justify-center shadow-xs shrink-0 overflow-hidden">
                   {currentUser.role === 'teacher' ? (
                     <img 
@@ -261,7 +266,6 @@ export const Navbar: React.FC = () => {
                   )}
                 </div>
 
-                {/* User Short Name (Matching "Hà Khánh" / "Cô Đỗ Mừng" in reference image) */}
                 <div className="text-left">
                   <div className="text-xs font-extrabold text-slate-800 dark:text-slate-100 leading-none">
                     {getShortName(currentUser.full_name)}
@@ -274,7 +278,6 @@ export const Navbar: React.FC = () => {
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition-colors ml-0.5" />
               </div>
 
-              {/* User Dropdown Menu */}
               {isUserDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#1A1E33] rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 p-3 z-50 animate-in fade-in slide-in-from-top-2">
                   <div className="p-3 rounded-2xl bg-blue-50/50 dark:bg-slate-800/50 mb-2">

@@ -16,12 +16,14 @@ import {
   Keyboard, 
   Cpu,
   Video,
-  FileText
+  FileText,
+  Radio
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { sound } from '../../lib/soundFx';
 import { LessonVideoPlayerView } from './LessonVideoPlayerView';
+import { EntertainmentHubView } from './EntertainmentHubView';
 
 export const SpecialTabsView: React.FC = () => {
   const { activeTab, setActiveTab, setIsPracticeModalOpen, setIsQuizModalOpen } = useApp();
@@ -29,7 +31,12 @@ export const SpecialTabsView: React.FC = () => {
 
   const [librarySubTab, setLibrarySubTab] = useState<'videos' | 'docs'>('videos');
 
-  // 1. 📖 THƯ VIỆN TÀI LIỆU & VIDEO BÀI GIẢNG SGK TIN HỌC 6
+  // 1. 📻 GÓC GIẢI TRÍ & ÂM NHẠC, TRUYỆN KỂ
+  if (activeTab === 'entertainment') {
+    return <EntertainmentHubView />;
+  }
+
+  // 2. 📖 THƯ VIỆN TÀI LIỆU & VIDEO BÀI GIẢNG SGK TIN HỌC 6
   if (activeTab === 'library') {
     return (
       <div className="space-y-6 animate-in fade-in duration-300">
@@ -129,7 +136,7 @@ export const SpecialTabsView: React.FC = () => {
     );
   }
 
-  // 2. 🎓 LUYỆN TẬP
+  // 3. 🎓 LUYỆN TẬP
   if (activeTab === 'practice') {
     return (
       <div className="space-y-6 animate-in fade-in duration-300">
@@ -193,7 +200,7 @@ export const SpecialTabsView: React.FC = () => {
     );
   }
 
-  // 3. 👑 TRÒ CHƠI (VIP)
+  // 4. 👑 TRÒ CHƠI (VIP)
   if (activeTab === 'games') {
     return (
       <div className="space-y-6 animate-in fade-in duration-300">
@@ -246,7 +253,7 @@ export const SpecialTabsView: React.FC = () => {
     );
   }
 
-  // 4. 📰 BẢNG TIN
+  // 5. 📰 BẢNG TIN
   if (activeTab === 'news') {
     return (
       <div className="space-y-6 animate-in fade-in duration-300">
@@ -295,7 +302,7 @@ export const SpecialTabsView: React.FC = () => {
     );
   }
 
-  // 5. 🎁 QUÀ TẶNG
+  // 6. 🎁 QUÀ TẶNG
   if (activeTab === 'gifts') {
     const handleDailyCheckin = () => {
       sound.victory();

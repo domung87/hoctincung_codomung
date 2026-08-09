@@ -14,7 +14,14 @@ import {
   Check,
   Zap,
   Target,
-  Video
+  Video,
+  Layers,
+  Cpu,
+  Globe,
+  Search,
+  ShieldCheck,
+  FileText,
+  Workflow
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../../context/AppContext';
@@ -41,6 +48,25 @@ export const LessonContent: React.FC = () => {
   const currentIndex = allLessons.findIndex(l => l.id === selectedLessonId);
   const prevLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null;
   const nextLesson = currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1] : null;
+
+  // Topic Color Schemes
+  const topicColorStyles: Record<string, {
+    border: string;
+    badgeBg: string;
+    gradient: string;
+    text: string;
+    icon: any;
+  }> = {
+    'A': { border: 'border-pink-300 dark:border-pink-800', badgeBg: 'bg-pink-100 text-pink-700', gradient: 'from-pink-500 to-rose-400', text: 'text-pink-600', icon: Cpu },
+    'B': { border: 'border-emerald-300 dark:border-emerald-800', badgeBg: 'bg-emerald-100 text-emerald-700', gradient: 'from-emerald-500 to-teal-400', text: 'text-emerald-600', icon: Globe },
+    'C': { border: 'border-blue-300 dark:border-blue-800', badgeBg: 'bg-blue-100 text-blue-700', gradient: 'from-blue-500 to-cyan-400', text: 'text-blue-600', icon: Search },
+    'D': { border: 'border-purple-300 dark:border-purple-800', badgeBg: 'bg-purple-100 text-purple-700', gradient: 'from-purple-500 to-indigo-400', text: 'text-purple-600', icon: ShieldCheck },
+    'E': { border: 'border-amber-300 dark:border-amber-800', badgeBg: 'bg-amber-100 text-amber-800', gradient: 'from-amber-500 to-yellow-400', text: 'text-amber-600', icon: FileText },
+    'F': { border: 'border-rose-300 dark:border-rose-800', badgeBg: 'bg-rose-100 text-rose-700', gradient: 'from-rose-500 to-red-400', text: 'text-rose-600', icon: Workflow },
+  };
+
+  const currentTheme = topicColorStyles[activeLesson.topicCode] || topicColorStyles['A'];
+  const TopicIcon = currentTheme.icon;
 
   // Handle Mark Complete
   const handleConfirmComplete = () => {
@@ -79,37 +105,40 @@ export const LessonContent: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 w-full bg-white dark:bg-[#151828] rounded-3xl p-6 md:p-8 border border-pink-100 dark:border-slate-800 shadow-sm space-y-8 relative">
+    <div className={`flex-1 w-full bg-white dark:bg-[#151828] rounded-3xl p-6 md:p-8 border-3 ${currentTheme.border} shadow-lg space-y-8 relative`}>
       
-      {/* 1. Lesson Header & Breadcrumbs */}
-      <div className="space-y-3 pb-6 border-b border-pink-100 dark:border-slate-800">
+      {/* 1. Lesson Header & Breadcrumbs with Vibrant Topic Badge */}
+      <div className="space-y-3 pb-6 border-b border-slate-100 dark:border-slate-800">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <span className="px-3.5 py-1 rounded-full bg-pinkBrand-50 text-pinkBrand-600 text-xs font-black tracking-wide">
-            CHỦ ĐỀ {activeLesson.topicCode} • TIN HỌC 6 KẾT NỐI TRI THỨC
-          </span>
+          <div className="flex items-center gap-2">
+            <span className={`px-4 py-1.5 rounded-full ${currentTheme.badgeBg} text-xs font-black tracking-wide flex items-center gap-1.5 shadow-xs border border-current/20`}>
+              <TopicIcon className="w-3.5 h-3.5" />
+              <span>CHỦ ĐỀ {activeLesson.topicCode} • TIN HỌC 6 KẾT NỐI TRI THỨC</span>
+            </span>
+          </div>
 
           <div className="flex items-center gap-3">
             {/* Quick Watch Video Button */}
             <button
               onClick={handleGoToVideo}
-              className="px-3.5 py-1 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-black flex items-center gap-1.5 transition-all shadow-xs border border-blue-200"
+              className="px-3.5 py-1.5 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-black flex items-center gap-1.5 transition-all shadow-xs border border-blue-200"
             >
               <Video className="w-3.5 h-3.5 text-blue-600" />
               <span>🎬 Xem Video Bài Giảng</span>
             </button>
 
-            <span className="text-xs text-slate-400 font-bold flex items-center gap-1.5">
+            <span className="text-xs text-slate-500 font-bold flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full">
               <Clock className="w-3.5 h-3.5 text-pinkBrand-500" />
               <span>{activeLesson.durationMinutes} phút</span>
             </span>
 
             {activeLesson.isCompleted ? (
-              <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-black flex items-center gap-1">
+              <span className="px-3.5 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-black flex items-center gap-1 shadow-xs">
                 <Check className="w-3.5 h-3.5 stroke-[3]" /> Đã Hoàn Thành
               </span>
             ) : (
-              <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
-                Đang Học
+              <span className="px-3.5 py-1.5 rounded-full bg-amber-100 text-amber-800 text-xs font-black border border-amber-300">
+                Đang Học 📖
               </span>
             )}
           </div>
@@ -120,11 +149,11 @@ export const LessonContent: React.FC = () => {
         </h2>
       </div>
 
-      {/* 2. Mục Tiêu Bài Học & Khám Phá */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-pink-50/80 via-rose-50/60 to-amber-50/60 dark:bg-slate-800/40 border border-pink-100 dark:border-slate-800 space-y-2">
+      {/* 2. Mục Tiêu Bài Học & Khám Phá với Khung Viền Nổi Bật */}
+      <div className="p-6 rounded-3xl bg-gradient-to-r from-pink-50/90 via-rose-50/70 to-amber-50/70 dark:bg-slate-800/60 border-2 border-pink-200 dark:border-slate-700 shadow-sm space-y-2.5">
         <h3 className="text-xs font-black text-pinkBrand-600 dark:text-pinkBrand-400 uppercase tracking-wider flex items-center gap-1.5">
           <Target className="w-4 h-4 text-pinkBrand-500" />
-          <span>🎯 Mục Tiêu Cần Đạt & Tóm Tắt Bài Học</span>
+          <span>🎯 Mục Tiêu Cần Đạt & Tóm Tắt Trọng Tâm</span>
         </h3>
         <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-semibold">
           {activeLesson.summary}
@@ -138,13 +167,13 @@ export const LessonContent: React.FC = () => {
           <span>📚 Kiến Thức Trọng Tâm Cần Ghi Nhớ</span>
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {activeLesson.keyPoints.map((point, index) => (
             <div 
               key={index}
-              className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700 flex items-start gap-3 hover:border-pinkBrand-300 transition-colors"
+              className="p-4 rounded-2xl bg-white dark:bg-slate-800/70 border-2 border-slate-200/90 dark:border-slate-700 flex items-start gap-3 hover:border-pinkBrand-400 shadow-xs hover:shadow-md transition-all"
             >
-              <div className="w-6 h-6 rounded-full bg-pinkBrand-100 dark:bg-pinkBrand-950/60 text-pinkBrand-600 font-black text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+              <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-pinkBrand-500 to-rose-400 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
                 {index + 1}
               </div>
               <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-medium">
@@ -155,7 +184,7 @@ export const LessonContent: React.FC = () => {
         </div>
       </div>
 
-      {/* 4. Khối Minh Họa Trực Quan / Thành Phần Tương Tác (Nếu có) */}
+      {/* 4. Khối Minh Họa Trực Quan / Thành Phần Tương Tác */}
       {activeLesson.components && activeLesson.components.length > 0 && (
         <div className="space-y-4 pt-2">
           <h3 className="text-sm font-black text-slate-800 dark:text-white flex items-center gap-2">
@@ -171,10 +200,10 @@ export const LessonContent: React.FC = () => {
                   sound.click();
                   setSelectedCompIndex(idx);
                 }}
-                className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all ${
+                className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all border-2 ${
                   selectedCompIndex === idx
-                    ? 'bg-pinkBrand-500 text-white shadow-md'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-pink-50'
+                    ? 'bg-pinkBrand-500 border-pinkBrand-600 text-white shadow-md scale-105'
+                    : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-pink-300'
                 }`}
               >
                 {comp.title.split(':')[0]}
@@ -183,14 +212,14 @@ export const LessonContent: React.FC = () => {
           </div>
 
           {activeLesson.components[selectedCompIndex] && (
-            <div className="p-6 rounded-3xl bg-pink-50/50 dark:bg-slate-800/40 border-2 border-pink-100 dark:border-slate-700 space-y-3 animate-in fade-in">
+            <div className="p-6 rounded-3xl bg-pink-50/60 dark:bg-slate-800/40 border-2 border-pink-200 dark:border-slate-700 space-y-3 animate-in fade-in shadow-xs">
               <h4 className="text-sm font-black text-pinkBrand-600 dark:text-pinkBrand-400">
                 {activeLesson.components[selectedCompIndex].title}
               </h4>
               <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 {activeLesson.components[selectedCompIndex].description}
               </p>
-              <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-pink-100 dark:border-slate-800 text-xs space-y-1">
+              <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border-2 border-pink-100 dark:border-slate-800 text-xs space-y-1.5 shadow-xs">
                 <div className="font-bold text-slate-800 dark:text-white">
                   ⚙️ <strong>Chức năng:</strong> {activeLesson.components[selectedCompIndex].functionText}
                 </div>
@@ -204,8 +233,8 @@ export const LessonContent: React.FC = () => {
       )}
 
       {/* 5. Khung Lời Dặn Dò Của Cô Đỗ Mừng */}
-      <div className="p-5 rounded-3xl bg-gradient-to-r from-pink-50 to-rose-50 dark:bg-slate-800/40 border border-pink-200 dark:border-slate-700 flex items-start gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-pinkBrand-500 text-white font-extrabold text-xs flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+      <div className="p-5 rounded-3xl bg-gradient-to-r from-pink-50 to-rose-50 dark:bg-slate-800/60 border-2 border-pink-300 dark:border-slate-700 flex items-start gap-4 shadow-sm">
+        <div className="w-12 h-12 rounded-2xl bg-pinkBrand-500 text-white font-extrabold text-xs flex items-center justify-center shrink-0 overflow-hidden shadow-md">
           <img src="/images/avatar_co_mung.jpg" alt="Cô Đỗ Mừng" className="w-full h-full object-cover" />
         </div>
         <div className="space-y-1 flex-1">
@@ -213,14 +242,14 @@ export const LessonContent: React.FC = () => {
             <span>👩‍🏫 Lời Dặn Dò Của Cô Đỗ Mừng:</span>
             <Heart className="w-3.5 h-3.5 fill-pinkBrand-500" />
           </div>
-          <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+          <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
             "Sau khi đọc xong lý thuyết, các em hãy nhấn nút <strong>Xem video bài giảng</strong> hoặc nhấn <strong>Xác nhận hoàn thành</strong> bên dưới để tích lũy XP, sau đó chuyển sang <strong>Luyện tập</strong> và <strong>Trò chơi</strong> nhé!"
           </p>
         </div>
       </div>
 
       {/* 6. BOTTOM ACTION BAR */}
-      <div className="pt-6 border-t border-pink-100 dark:border-slate-800 space-y-4">
+      <div className="pt-6 border-t border-slate-100 dark:border-slate-800 space-y-4">
         
         {/* Main Action Buttons */}
         <div className="flex flex-wrap items-center justify-center sm:justify-between gap-3">
@@ -268,7 +297,7 @@ export const LessonContent: React.FC = () => {
           {prevLesson ? (
             <button
               onClick={() => handleNavigate(prevLesson.id)}
-              className="px-4 py-2 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-pink-50 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center gap-1.5 transition-colors"
+              className="px-4 py-2 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-pink-50 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center gap-1.5 transition-colors border border-slate-200 dark:border-slate-700"
             >
               <ChevronLeft className="w-4 h-4" />
               <span>◀ Bài Trước: {prevLesson.title.split(':')[0]}</span>
@@ -278,7 +307,7 @@ export const LessonContent: React.FC = () => {
           {nextLesson && (
             <button
               onClick={() => handleNavigate(nextLesson.id)}
-              className="px-4 py-2 rounded-2xl bg-pinkBrand-50 hover:bg-pinkBrand-100 text-pinkBrand-600 text-xs font-extrabold flex items-center gap-1.5 transition-colors ml-auto"
+              className="px-4 py-2 rounded-2xl bg-pinkBrand-50 hover:bg-pinkBrand-100 text-pinkBrand-600 text-xs font-extrabold flex items-center gap-1.5 transition-colors ml-auto border border-pinkBrand-200"
             >
               <span>Bài Tiếp Theo: {nextLesson.title.split(':')[0]} ▶</span>
               <ChevronRight className="w-4 h-4" />
@@ -286,21 +315,6 @@ export const LessonContent: React.FC = () => {
           )}
         </div>
 
-      </div>
-
-      {/* Floating Mascot AI Assistant Cô Đỗ Mừng */}
-      <div className="fixed bottom-5 right-5 z-40 flex items-end gap-3 pointer-events-none">
-        <div className="bg-white dark:bg-[#1A1E33] p-3.5 rounded-2xl shadow-2xl border-2 border-pink-200 dark:border-slate-700 max-w-xs pointer-events-auto animate-bounce duration-1000 hidden md:block">
-          <p className="text-xs font-extrabold text-slate-800 dark:text-white leading-relaxed">
-            "Chào em! Cô Đỗ Mừng chúc em học tốt bài <strong>{activeLesson.title.split(':')[0]}</strong> nhé! 🌸💖"
-          </p>
-        </div>
-
-        <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-pinkBrand-500 to-rose-400 p-0.5 shadow-2xl pointer-events-auto cursor-pointer hover:scale-110 transition-transform">
-          <div className="w-full h-full rounded-full overflow-hidden bg-white">
-            <img src="/images/avatar_co_mung.jpg" alt="Mascot Cô Đỗ Mừng" className="w-full h-full object-cover" />
-          </div>
-        </div>
       </div>
 
     </div>
