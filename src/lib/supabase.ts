@@ -2,7 +2,11 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Tin6Topic, Question, Submission, UserProfile } from '../types';
 import { TIN6_TOPICS, INITIAL_QUESTIONS, INITIAL_SUBMISSIONS, INITIAL_PROFILES } from './mockData';
 
-// Get active configuration (Priority: localStorage > import.meta.env)
+// User's Live Supabase Project Credentials
+export const DEFAULT_SUPABASE_URL = 'https://ypyeodvomjcvccltkucf.supabase.co';
+export const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlweWVvZHZvbWpjdmNjbHRrdWNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNjI4NzAsImV4cCI6MjEwMTgzODg3MH0.YFJuvXxho9r42J-FRILr9rDjnalV3lOR4u56bmU3YJA';
+
+// Get active configuration (Priority: localStorage > import.meta.env > DEFAULT)
 export const getSupabaseConfig = () => {
   const localUrl = localStorage.getItem('skillset_supabase_url');
   const localKey = localStorage.getItem('skillset_supabase_anon_key');
@@ -10,10 +14,10 @@ export const getSupabaseConfig = () => {
   const envUrl = import.meta.env.VITE_SUPABASE_URL;
   const envKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-  const url = localUrl || envUrl || '';
-  const anonKey = localKey || envKey || '';
+  const url = localUrl || envUrl || DEFAULT_SUPABASE_URL;
+  const anonKey = localKey || envKey || DEFAULT_SUPABASE_ANON_KEY;
 
-  const isLive = Boolean(url && anonKey && url.startsWith('https://') && !url.includes('demo-skillset'));
+  const isLive = Boolean(url && anonKey && url.startsWith('https://'));
 
   return { url, anonKey, isLive };
 };
@@ -67,6 +71,13 @@ export const testSupabaseConnection = async (): Promise<{ success: boolean; mess
     const latencyMs = Math.round(performance.now() - startTime);
 
     if (error) {
+      if (error.code === 'PGRST205' || error.message.includes('Could not find the table')) {
+        return { 
+          success: true, 
+          message: `Kết nối thành công tới Supabase! (Lưu ý: Thầy/Cô cần chạy file init_database.sql trong SQL Editor để tạo bảng).`,
+          latencyMs 
+        };
+      }
       return { success: false, message: `Lỗi từ Supabase: ${error.message}` };
     }
 
@@ -104,7 +115,7 @@ export const fetchTopicsFromSupabase = async (): Promise<Tin6Topic[]> => {
       .select('*')
       .order('lesson_number', { ascending: true });
 
-    if (lessonsErr || !lessonsData) {
+    if (lessonsErr || !lessonsData || lessonsData.length === 0) {
       return TIN6_TOPICS;
     }
 
@@ -130,7 +141,7 @@ export const fetchTopicsFromSupabase = async (): Promise<Tin6Topic[]> => {
         }))
     }));
   } catch (err) {
-    console.warn('Sử dụng dữ liệu mẫu do lỗi kết nối Supabase:', err);
+    console.warn('Sử dụng dữ liệu mẫu do chưa khởi tạo bảng trên Supabase:', err);
     return TIN6_TOPICS;
   }
 };
