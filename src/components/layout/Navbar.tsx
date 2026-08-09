@@ -5,15 +5,17 @@ import {
   Keyboard, 
   HelpCircle, 
   BarChart3, 
-  UserCheck, 
   ChevronDown,
   Laptop,
   Database,
+  LogIn,
+  LogOut,
+  UserPlus,
+  GraduationCap,
   ShieldCheck
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
-import { UserRole } from '../../types';
 import { sound } from '../../lib/soundFx';
 
 export const Navbar: React.FC = () => {
@@ -26,8 +28,14 @@ export const Navbar: React.FC = () => {
     isLiveSupabase
   } = useApp();
   
-  const { currentUser, switchRole } = useAuth();
-  const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
+  const { 
+    currentUser, 
+    isLoggedIn, 
+    openAuthModal, 
+    logout 
+  } = useAuth();
+
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
 
   const handleNavClick = (tabId: string) => {
     sound.click();
@@ -35,16 +43,9 @@ export const Navbar: React.FC = () => {
       setIsPracticeModalOpen(true);
     } else if (tabId === 'quiz') {
       setIsQuizModalOpen(true);
-    } else if (tabId === 'roles') {
-      setIsRoleDropdownOpen(!isRoleDropdownOpen);
     } else {
       setActiveTab(tabId);
     }
-  };
-
-  const handleRoleSelect = (role: UserRole) => {
-    switchRole(role);
-    setIsRoleDropdownOpen(false);
   };
 
   return (
@@ -66,7 +67,7 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Center: Navigation Menu Tabs (Exact match to Image 3) */}
+        {/* Center: Navigation Menu Tabs */}
         <div className="flex items-center gap-1 md:gap-2 flex-wrap">
           <button
             onClick={() => handleNavClick('home')}
@@ -134,76 +135,125 @@ export const Navbar: React.FC = () => {
           >
             <Database className="w-3.5 h-3.5 text-emerald-500" />
             <span className="hidden sm:inline">Supabase DB</span>
-            {isLiveSupabase ? (
+            {isLiveSupabase && (
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            ) : (
-              <span className="text-[10px] text-slate-400">Kết nối</span>
             )}
           </button>
-
-          {/* Role Switcher Button */}
-          <div className="relative">
-            <button
-              onClick={() => handleNavClick('roles')}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-            >
-              <UserCheck className="w-4 h-4 text-brand-500" />
-              <span>Đổi Vai Trò</span>
-            </button>
-
-            {isRoleDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#1A1E33] rounded-2xl shadow-xl border border-pink-100 dark:border-slate-800 p-2 z-50 animate-in fade-in slide-in-from-top-2">
-                <div className="text-[10px] font-bold text-slate-400 px-3 py-1 uppercase">Chọn vai trò trải nghiệm</div>
-                <button
-                  onClick={() => handleRoleSelect('teacher')}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-between ${
-                    currentUser.role === 'teacher' ? 'bg-pinkBrand-50 text-pinkBrand-600' : 'hover:bg-slate-50'
-                  }`}
-                >
-                  <span>👩‍🏫 Cô Đỗ Mừng (Giáo viên)</span>
-                </button>
-                <button
-                  onClick={() => handleRoleSelect('student')}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-between ${
-                    currentUser.role === 'student' ? 'bg-pinkBrand-50 text-pinkBrand-600' : 'hover:bg-slate-50'
-                  }`}
-                >
-                  <span>🎒 Em Học Sinh (Lớp 6A1)</span>
-                </button>
-                <button
-                  onClick={() => handleRoleSelect('admin')}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-between ${
-                    currentUser.role === 'admin' ? 'bg-pinkBrand-50 text-pinkBrand-600' : 'hover:bg-slate-50'
-                  }`}
-                >
-                  <span>🛡️ Quản Trị Viên (Admin)</span>
-                </button>
-              </div>
-            )}
-          </div>
         </div>
 
-        {/* Right: User Profile Indicator (Exact match to Image 3) */}
-        <div 
-          onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
-          className="flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-pink-200 dark:border-slate-700 bg-pink-50/60 dark:bg-slate-800/40 cursor-pointer hover:shadow-sm transition-all"
-        >
-          <div className="w-8 h-8 rounded-full bg-pinkBrand-500 text-white font-extrabold text-xs flex items-center justify-center shadow-sm overflow-hidden">
-            {currentUser.role === 'teacher' ? (
-              <img src={currentUser.avatar_url} alt="DM" className="w-full h-full object-cover" />
-            ) : (
-              <span>{currentUser.full_name.slice(0, 2).toUpperCase()}</span>
-            )}
-          </div>
-          <div className="text-left hidden sm:block">
-            <div className="text-xs font-extrabold text-slate-800 dark:text-white leading-tight">
-              {currentUser.full_name}
+        {/* Right: Authentication & User Profile on top right */}
+        <div className="flex items-center gap-2">
+          {!isLoggedIn ? (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => openAuthModal('student_register')}
+                className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold text-pinkBrand-600 bg-pink-50 hover:bg-pink-100 transition-colors"
+              >
+                <UserPlus className="w-4 h-4" />
+                <span>Đăng Ký Học Sinh</span>
+              </button>
+
+              <button
+                onClick={() => openAuthModal('teacher_login')}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-extrabold bg-gradient-to-r from-pinkBrand-500 to-rose-500 text-white shadow-md hover:scale-105 transition-all"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Đăng Nhập</span>
+              </button>
             </div>
-            <div className="text-[10px] font-semibold text-pinkBrand-600 dark:text-pinkBrand-400">
-              {currentUser.role === 'teacher' ? '👩‍🏫 Giáo viên: Cô Đỗ Mừng' : currentUser.role === 'admin' ? '🛡️ Quản trị viên' : '🎒 Học sinh'}
+          ) : (
+            <div className="relative">
+              <div 
+                onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border-2 border-pink-200 dark:border-slate-700 bg-pink-50/70 dark:bg-slate-800/60 cursor-pointer hover:shadow-md transition-all select-none"
+              >
+                <div className="w-8 h-8 rounded-full bg-pinkBrand-500 text-white font-extrabold text-xs flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+                  {currentUser.role === 'teacher' ? (
+                    <img src={currentUser.avatar_url} alt="DM" className="w-full h-full object-cover" />
+                  ) : (
+                    <span>{currentUser.full_name.slice(0, 2).toUpperCase()}</span>
+                  )}
+                </div>
+                <div className="text-left hidden sm:block">
+                  <div className="text-xs font-extrabold text-slate-800 dark:text-white leading-tight">
+                    {currentUser.full_name}
+                  </div>
+                  <div className="text-[10px] font-bold text-pinkBrand-600 dark:text-pinkBrand-400">
+                    {currentUser.role === 'teacher' 
+                      ? '👩‍🏫 Giáo Viên (Gmail)' 
+                      : `🎒 Học Sinh (${currentUser.classroom || 'Lớp 6'})`}
+                  </div>
+                </div>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+              </div>
+
+              {/* User Dropdown Menu */}
+              {isUserDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#1A1E33] rounded-3xl shadow-2xl border border-pink-100 dark:border-slate-800 p-3 z-50 animate-in fade-in slide-in-from-top-2">
+                  <div className="p-3 rounded-2xl bg-pink-50/50 dark:bg-slate-800/50 mb-2">
+                    <div className="text-xs font-extrabold text-slate-800 dark:text-white">
+                      {currentUser.full_name}
+                    </div>
+                    <div className="text-[11px] text-slate-400 mt-0.5">
+                      {currentUser.email}
+                    </div>
+                    <div className="mt-2 flex items-center justify-between text-[11px] font-bold text-pinkBrand-600">
+                      <span>Cấp độ: Level {currentUser.level}</span>
+                      <span>{currentUser.xp} XP</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <button
+                      onClick={() => {
+                        setIsUserDropdownOpen(false);
+                        openAuthModal('teacher_login');
+                      }}
+                      className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-pink-50 dark:hover:bg-slate-800 flex items-center gap-2"
+                    >
+                      <ShieldCheck className="w-4 h-4 text-pinkBrand-500" />
+                      <span>Đăng nhập Gmail Giáo Viên</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setIsUserDropdownOpen(false);
+                        openAuthModal('student_login');
+                      }}
+                      className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-pink-50 dark:hover:bg-slate-800 flex items-center gap-2"
+                    >
+                      <GraduationCap className="w-4 h-4 text-amber-500" />
+                      <span>Đăng nhập / Đổi tài khoản Học sinh</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setIsUserDropdownOpen(false);
+                        openAuthModal('student_register');
+                      }}
+                      className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-pink-50 dark:hover:bg-slate-800 flex items-center gap-2"
+                    >
+                      <UserPlus className="w-4 h-4 text-emerald-500" />
+                      <span>Đăng Ký Học Sinh Mới</span>
+                    </button>
+
+                    <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
+
+                    <button
+                      onClick={() => {
+                        setIsUserDropdownOpen(false);
+                        logout();
+                      }}
+                      className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center gap-2"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Đăng Xuất</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-          <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+          )}
         </div>
       </div>
     </nav>

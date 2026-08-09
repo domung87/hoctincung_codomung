@@ -11,6 +11,7 @@ import { GreetingModal } from './components/modals/GreetingModal';
 import { PracticeModal } from './components/modals/PracticeModal';
 import { QuizModal } from './components/modals/QuizModal';
 import { SupabaseConfigModal } from './components/modals/SupabaseConfigModal';
+import { AuthModal } from './components/modals/AuthModal';
 
 import { useApp } from './context/AppContext';
 
@@ -27,7 +28,7 @@ export const App: React.FC = () => {
       {/* 1. Top Colorful Banner with "CÙNG HỌC TIN 6 VỚI CÔ ĐỖ MỪNG" */}
       <BannerHeader />
 
-      {/* 2. Navigation Bar */}
+      {/* 2. Navigation Bar with Top-Right Auth Buttons */}
       <Navbar />
 
       {/* 3. Main Body Container */}
@@ -51,6 +52,7 @@ export const App: React.FC = () => {
       <GreetingModal />
       <PracticeModal />
       <QuizModal />
+      <AuthModal />
       <SupabaseConfigModal
         isOpen={isSupabaseConfigOpen}
         onClose={() => setIsSupabaseConfigOpen(false)}
