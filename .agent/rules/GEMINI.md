@@ -261,7 +261,7 @@ These agents contain:
 ### Agents & Skills
 
 - Masters: `orchestrator`, `project-planner`, `security-auditor` (Cyber/Audit), `backend-specialist` (API/DB), `frontend-specialist` (UI/UX), `mobile-developer`, `debugger`, `game-developer`
-- Key Skills: `clean-code`, `brainstorming`, `app-builder`, `frontend-design`, `mobile-design`, `plan-writing`, `behavioral-modes`
+- Key Skills: `clean-code`, `brainstorming`, `app-builder`, `frontend-design`, `taste-skill`, `redesign-skill`, `soft-skill`, `ui-ux-pro-max`, `mobile-design`, `plan-writing`, `behavioral-modes`
 
 ### Key Scripts
 
