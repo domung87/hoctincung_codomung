@@ -58,7 +58,7 @@ export const BannerHeader: React.FC = () => {
       confetti({
         particleCount: 45,
         spread: 60,
-        origin: { x: 0.5, y: 0.2 },
+        origin: { x: 0.5, y: 0.15 },
         colors: ['#FF5288', '#FF7A59', '#FFD700', '#FF69B4']
       });
     }
@@ -95,49 +95,101 @@ export const BannerHeader: React.FC = () => {
     <div className="w-full select-none relative bg-gradient-to-r from-[#FF5288] via-[#FF7A59] to-[#FFA048] shadow-md border-b-2 border-pink-300/80">
       
       {/* =========================================================================
-          MAIN PANORAMIC BANNER CONTAINER (100% TRỌN VẸN KHÔNG BỊ CẮT XÉN)
+          PANORAMIC 3-BLOCK CONTAINER: BÉ NAM (TRÁI) - CÔ ĐỖ MỪNG (GIỮA) - BÉ MAI (PHẢI)
           ========================================================================= */}
-      <div className="w-full max-w-[1280px] mx-auto px-2 sm:px-4 py-2 sm:py-3 space-y-2">
+      <div className="w-full max-w-[1440px] mx-auto px-2 sm:px-4 py-2 sm:py-3 space-y-2">
         
-        {/* BANNER 3D CHÍNH: TỰ ĐỘNG THU NHỎ CO GIÃN THEO TỶ LỆ 16:9 CHUẨN XÁC 100% */}
-        <div 
-          onClick={handleOpenZoomModal}
-          className="relative cursor-pointer group rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg border-2 border-white/80 bg-pink-100/40 backdrop-blur-xs flex items-center justify-center transition-all hover:shadow-xl"
-          title="Bấm để xem ảnh phóng to Full HD"
-        >
-          {/* Ảnh banner 3D: object-contain, w-full h-auto, không bao giờ bị cắt chữ hay mất nét cô giáo */}
-          <img
-            src="/images/banner_tin6_real.png"
-            alt="CÙNG HỌC TIN HỌC 6 VỚI CÔ ĐỖ MỪNG"
-            className="w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[290px] object-contain block mx-auto transition-transform duration-500 group-hover:scale-[1.008]"
-            style={{ imageRendering: 'auto' }}
-          />
-
-          {/* Tia sáng quét nhẹ Shimmer Sweep */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
-            <div className="w-1/3 h-[250%] bg-gradient-to-r from-transparent via-white/25 to-transparent absolute -top-1/2 left-0 animate-shimmer-sweep pointer-events-none" />
+        <div className="flex items-center justify-between gap-2 sm:gap-4 relative">
+          
+          {/* KHỐI 1 (BÊN TRÁI): BÉ TRAI 3D CUTE (GẬT ĐẦU & CHỚP MẮT THEO NHỊP) */}
+          <div 
+            onClick={() => {
+              sound.click();
+              confetti({ particleCount: 30, spread: 50, origin: { x: 0.08, y: 0.15 } });
+              alert('👦 Bé Nam (Lớp 6A): "Em chào Cô Đỗ Mừng ạ! Em rất thích học Tin học 6!" 🌸');
+            }}
+            className="hidden md:flex flex-col items-center justify-center relative z-20 cursor-pointer shrink-0 animate-student-boy group/boy"
+            title="Bé Nam (Lớp 6A) - Bấm để trò chuyện"
+          >
+            <div className="w-20 h-28 lg:w-24 lg:h-34 xl:w-28 xl:h-40 rounded-3xl overflow-hidden shadow-xl border-2 border-white/90 bg-white/40 backdrop-blur-md p-0.5 group-hover/boy:scale-105 group-hover/boy:border-blue-300 transition-all flex items-center justify-center relative">
+              <img 
+                src="/images/student_boy.jpg" 
+                alt="Học sinh nam Tin học 6" 
+                className="w-full h-full object-cover rounded-[20px]"
+              />
+              {/* Eyelid Blink Overlay */}
+              <div className="absolute inset-0 bg-amber-950 pointer-events-none rounded-[20px] animate-eye-blink" />
+            </div>
+            <span className="text-[10px] font-black text-white bg-black/30 px-2.5 py-0.5 rounded-full mt-1 backdrop-blur-xs border border-white/20 shadow-xs">
+              Bé Nam 👦
+            </span>
           </div>
 
-          {/* Hiệu ứng ánh sáng Ngày / Đêm nhẹ nhàng */}
-          {isDayTime ? (
-            <div className="absolute inset-0 pointer-events-none z-10 bg-gradient-to-tr from-amber-400/5 via-yellow-200/5 to-transparent mix-blend-overlay" />
-          ) : (
-            <div className="absolute inset-0 pointer-events-none z-10 bg-gradient-to-b from-indigo-950/20 via-purple-950/15 to-transparent mix-blend-multiply" />
-          )}
+          {/* KHỐI 2 (Ở GIỮA): BANNER CHÍNH CÔ GIÁO ĐỖ MỪNG (100% KHÔNG BỊ CẮT XÉN) */}
+          <div 
+            onClick={handleOpenZoomModal}
+            className="flex-1 min-w-0 max-w-[1020px] mx-auto relative cursor-pointer group rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg border-2 border-white/80 bg-pink-100/30 backdrop-blur-xs flex items-center justify-center transition-all hover:shadow-xl"
+            title="Bấm để xem ảnh phóng to Full HD"
+          >
+            {/* Ảnh banner 3D: object-contain, w-full h-auto, không bao giờ bị cắt chữ hay mất nét cô giáo */}
+            <img
+              src="/images/banner_tin6_real.png"
+              alt="CÙNG HỌC TIN HỌC 6 VỚI CÔ ĐỖ MỪNG"
+              className="w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[290px] object-contain block mx-auto transition-transform duration-500 group-hover:scale-[1.008]"
+              style={{ imageRendering: 'auto' }}
+            />
 
-          {/* Nút phóng to nhỏ ở góc trên bên phải */}
-          <div className="absolute top-2 right-2 z-20">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleOpenZoomModal();
-              }}
-              title="Phóng to xem Full HD"
-              className="p-1.5 sm:p-2 rounded-full bg-white/90 hover:bg-white text-[#FF5288] shadow-md border border-pink-200 backdrop-blur-md transition-all hover:scale-105"
-            >
-              <Maximize2 className="w-3.5 h-3.5" />
-            </button>
+            {/* Tia sáng quét nhẹ Shimmer Sweep */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
+              <div className="w-1/3 h-[250%] bg-gradient-to-r from-transparent via-white/25 to-transparent absolute -top-1/2 left-0 animate-shimmer-sweep pointer-events-none" />
+            </div>
+
+            {/* Hiệu ứng ánh sáng Ngày / Đêm */}
+            {isDayTime ? (
+              <div className="absolute inset-0 pointer-events-none z-10 bg-gradient-to-tr from-amber-400/5 via-yellow-200/5 to-transparent mix-blend-overlay" />
+            ) : (
+              <div className="absolute inset-0 pointer-events-none z-10 bg-gradient-to-b from-indigo-950/20 via-purple-950/15 to-transparent mix-blend-multiply" />
+            )}
+
+            {/* Nút phóng to nhỏ ở góc trên bên phải */}
+            <div className="absolute top-2 right-2 z-20">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenZoomModal();
+                }}
+                title="Phóng to xem Full HD"
+                className="p-1.5 sm:p-2 rounded-full bg-white/90 hover:bg-white text-[#FF5288] shadow-md border border-pink-200 backdrop-blur-md transition-all hover:scale-105"
+              >
+                <Maximize2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
+
+          {/* KHỐI 3 (BÊN PHẢI): BÉ GÁI 3D CUTE (GẬT ĐẦU & CHỚP MẮT THEO NHỊP) */}
+          <div 
+            onClick={() => {
+              sound.click();
+              confetti({ particleCount: 30, spread: 50, origin: { x: 0.92, y: 0.15 } });
+              alert('👧 Bé Mai (Lớp 6B): "Học Tin học cùng Cô Đỗ Mừng vui lắm các bạn ơi! Chúc cả lớp đạt điểm 10!" 🎀');
+            }}
+            className="hidden md:flex flex-col items-center justify-center relative z-20 cursor-pointer shrink-0 animate-student-girl group/girl"
+            title="Bé Mai (Lớp 6B) - Bấm để trò chuyện"
+          >
+            <div className="w-20 h-28 lg:w-24 lg:h-34 xl:w-28 xl:h-40 rounded-3xl overflow-hidden shadow-xl border-2 border-white/90 bg-white/40 backdrop-blur-md p-0.5 group-hover/girl:scale-105 group-hover/girl:border-pink-300 transition-all flex items-center justify-center relative">
+              <img 
+                src="/images/student_girl.jpg" 
+                alt="Học sinh nữ Tin học 6" 
+                className="w-full h-full object-cover rounded-[20px]"
+              />
+              {/* Eyelid Blink Overlay */}
+              <div className="absolute inset-0 bg-amber-950 pointer-events-none rounded-[20px] animate-eye-blink" />
+            </div>
+            <span className="text-[10px] font-black text-white bg-black/30 px-2.5 py-0.5 rounded-full mt-1 backdrop-blur-xs border border-white/20 shadow-xs">
+              Bé Mai 👧
+            </span>
+          </div>
+
         </div>
 
         {/* THANH ĐIỀU KHIỂN DƯỚI BANNER (KHÔNG CHE MẤT BẤT KỲ CHI TIẾT NÀO TRÊN ẢNH) */}
@@ -165,7 +217,7 @@ export const BannerHeader: React.FC = () => {
           </div>
 
           {/* Center Slogan */}
-          <div className="hidden md:flex items-center gap-1.5 text-white text-xs font-black drop-shadow-xs">
+          <div className="hidden lg:flex items-center gap-1.5 text-white text-xs font-black drop-shadow-xs">
             <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
             <span>Môn Tin Học 6 • Bộ Sách Kết Nối Tri Thức Với Cuộc Sống 🌸</span>
           </div>
