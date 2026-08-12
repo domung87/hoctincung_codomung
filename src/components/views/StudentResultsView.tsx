@@ -24,7 +24,7 @@ export const StudentResultsView: React.FC = () => {
   const { currentUser } = useAuth();
 
   // Find evaluation for current student or fallback to first student
-  const studentEval = INITIAL_EVALUATIONS.find(e => 
+  const studentEval = INITIAL_EVALUATIONS.find((e: any) => 
     e.student_id === currentUser.id || 
     currentUser.full_name.includes(e.student_name) ||
     e.student_name.includes(currentUser.full_name)
@@ -157,7 +157,7 @@ export const StudentResultsView: React.FC = () => {
         </h4>
 
         <div className="flex flex-wrap gap-2.5">
-          {studentEval.badges_earned.map((b, i) => (
+          {studentEval.badges_earned.map((b: string, i: number) => (
             <div
               key={i}
               className="px-4 py-2 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-xs font-black text-amber-800 dark:text-amber-300 shadow-xs flex items-center gap-1.5"

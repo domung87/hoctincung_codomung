@@ -23,7 +23,14 @@ import {
   Workflow,
   GraduationCap,
   Layers,
-  ArrowRight
+  ArrowRight,
+  FileDown,
+  ExternalLink,
+  Send,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+  HelpCircle as QuestionMark
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../../context/AppContext';
@@ -39,17 +46,34 @@ export const LessonContent: React.FC = () => {
     setActiveTab,
     setIsPracticeModalOpen, 
     setIsQuizModalOpen,
-    toggleCompleteLesson 
+    toggleCompleteLesson,
+    questions,
+    assignments,
+    submitAssignment
   } = useApp();
   
-  const { addXP, addCoins } = useAuth();
+  const { addXP, addCoins, currentUser } = useAuth();
   const [selectedCompIndex, setSelectedCompIndex] = useState<number>(0);
+
+  // In-lesson interactive quiz state
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [isAnswerSubmitted, setIsAnswerSubmitted] = useState<boolean>(false);
+
+  // Quick homework submission input
+  const [homeworkText, setHomeworkText] = useState<string>('');
+  const [isHomeworkSubmitted, setIsHomeworkSubmitted] = useState<boolean>(false);
 
   // Flatten all 17 lessons for navigation
   const allLessons = topics.flatMap(t => t.lessons);
   const currentIndex = allLessons.findIndex(l => l.id === selectedLessonId);
   const prevLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null;
   const nextLesson = currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1] : null;
+
+  // Find question matching the active lesson
+  const currentQuestion = questions.find(q => q.lesson_id === activeLesson.id) || questions[0];
+
+  // Find assignment matching the active lesson
+  const currentAssignment = assignments.find(a => a.lesson_id === activeLesson.id);
 
   // 6 Distinct Vibrant & Professional Topic Themes
   const topicThemeStyles: Record<string, {
@@ -202,7 +226,50 @@ export const LessonContent: React.FC = () => {
     sound.click();
     setSelectedLessonId(lessonId);
     setSelectedCompIndex(0);
+    setSelectedOption(null);
+    setIsAnswerSubmitted(false);
+    setHomeworkText('');
+    setIsHomeworkSubmitted(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Submit in-lesson quiz question
+  const handleCheckQuizAnswer = () => {
+    if (!selectedOption) return;
+    setIsAnswerSubmitted(true);
+    if (selectedOption === currentQuestion.correct_answer) {
+      sound.correct();
+      addXP(20, 'Trả lời đúng câu hỏi bài học');
+      addCoins(10);
+      confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { y: 0.5 }
+      });
+    } else {
+      sound.wrong();
+    }
+  };
+
+  // Submit quick in-lesson homework
+  const handleSubmitHomework = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!homeworkText.trim()) return;
+
+    if (currentAssignment) {
+      submitAssignment(
+        currentAssignment.id,
+        homeworkText,
+        currentUser?.id || 'student-1',
+        currentUser?.full_name || 'Em Học Sinh',
+        currentUser?.avatar_url || '/images/student_boy.jpg'
+      );
+    }
+    setIsHomeworkSubmitted(true);
+    addXP(30, 'Nộp bài tập vận dụng');
+    addCoins(15);
+    confetti({ particleCount: 70, spread: 70, origin: { y: 0.7 } });
+    alert('🎉 Em đã gửi bài làm thành công tới Cô Đỗ Mừng! Cô sẽ sớm chấm và nhận xét nhé! 💖');
   };
 
   return (
@@ -245,14 +312,18 @@ export const LessonContent: React.FC = () => {
             <span>Làm Trắc Nghiệm</span>
           </button>
 
-          {/* Button 3: Video Giảng */}
-          <button
-            onClick={handleGoToVideo}
-            className="px-3.5 py-2 sm:py-2.5 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all border border-blue-200"
+          {/* Button 3: Đọc SGK PDF Gốc */}
+          <a
+            href="https://thanhtri.hanoi.shieldix.app/data/doc/2025/thcslienninh/2025_3/9/sach-giao-khoa-tin-hoc-6-ket-noi-tri-thuc-voi-cuoc-song_93202518.pdf"
+            target="_blank"
+            rel="noreferrer"
+            className="px-3.5 py-2 sm:py-2.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all border border-emerald-200"
+            title="Đọc toàn bộ file PDF Sách Giáo Khoa Tin Học 6 Kết Nối Tri Thức gốc"
           >
-            <Video className="w-4 h-4" />
-            <span>Video Giảng</span>
-          </button>
+            <FileDown className="w-4 h-4 text-emerald-600" />
+            <span>Đọc SGK PDF</span>
+            <ExternalLink className="w-3 h-3 text-emerald-500" />
+          </a>
         </div>
 
       </div>
@@ -281,7 +352,7 @@ export const LessonContent: React.FC = () => {
           <div className={`flex items-center gap-2 pb-2 border-b ${currentTheme.cardBorder}`}>
             <BookOpen className={`w-4 h-4 ${currentTheme.textColor}`} />
             <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wide">
-              1. Kiến Thức Trọng Tâm Cần Ghi Nhớ
+              1. Kiến Thức Trọng Tâm Cần Ghi Nhớ (SGK Kết Nối Tri Thức)
             </h4>
           </div>
 
@@ -353,7 +424,190 @@ export const LessonContent: React.FC = () => {
           </div>
         )}
 
-        {/* 3. FLOATING MASCOT SPEECH BUBBLE */}
+        {/* Section 3: CÂU HỎI TRẮC NGHIỆM TƯƠNG TÁC TRỰC TIẾP (IN-LESSON QUIZ) */}
+        {currentQuestion && (
+          <div className="space-y-4 pt-2">
+            <div className={`flex items-center gap-2 pb-2 border-b ${currentTheme.cardBorder}`}>
+              <QuestionMark className="w-4 h-4 text-blue-500" />
+              <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wide">
+                3. Tự Kiểm Tra Nhanh: Trả Lời Câu Hỏi Cùng Cô Đỗ Mừng 🌸
+              </h4>
+            </div>
+
+            <div className={`p-5 sm:p-6 rounded-3xl border-2 space-y-4 bg-white dark:bg-slate-900 ${currentTheme.cardBorder}`}>
+              <div className="flex items-start gap-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-[11px] font-black shrink-0">
+                  Câu hỏi kiểm tra
+                </span>
+                <p className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+                  {currentQuestion.question_text}
+                </p>
+              </div>
+
+              {/* Options list */}
+              <div className="space-y-2 pt-1">
+                {currentQuestion.options.map((option, idx) => {
+                  const isSelected = selectedOption === option;
+                  const isCorrect = option === currentQuestion.correct_answer;
+
+                  let optionStyle = 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:border-blue-400';
+                  
+                  if (isAnswerSubmitted) {
+                    if (isCorrect) {
+                      optionStyle = 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-500 text-emerald-800 dark:text-emerald-300 font-bold';
+                    } else if (isSelected && !isCorrect) {
+                      optionStyle = 'bg-rose-50 dark:bg-rose-950/50 border-rose-500 text-rose-800 dark:text-rose-300 font-bold';
+                    }
+                  } else if (isSelected) {
+                    optionStyle = `${currentTheme.tabActive}`;
+                  }
+
+                  return (
+                    <div
+                      key={idx}
+                      onClick={() => {
+                        if (!isAnswerSubmitted) {
+                          sound.click();
+                          setSelectedOption(option);
+                        }
+                      }}
+                      className={`p-3 sm:p-3.5 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between text-xs sm:text-sm ${optionStyle}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="w-6 h-6 rounded-full bg-white/80 dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center font-black text-xs border border-slate-300 dark:border-slate-600 shrink-0">
+                          {String.fromCharCode(65 + idx)}
+                        </span>
+                        <span>{option}</span>
+                      </div>
+
+                      {isAnswerSubmitted && isCorrect && (
+                        <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+                      )}
+                      {isAnswerSubmitted && isSelected && !isCorrect && (
+                        <XCircle className="w-5 h-5 text-rose-500 shrink-0" />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Action & Feedback */}
+              <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                {!isAnswerSubmitted ? (
+                  <button
+                    onClick={handleCheckQuizAnswer}
+                    disabled={!selectedOption}
+                    className={`px-6 py-2.5 rounded-full font-black text-xs sm:text-sm transition-all shadow-md ${
+                      selectedOption
+                        ? `${currentTheme.buttonPrimary} hover:scale-105`
+                        : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                    }`}
+                  >
+                    Kiểm Tra Kết Quả 🎯
+                  </button>
+                ) : (
+                  <div className="space-y-1.5 w-full">
+                    <div className={`p-3 rounded-2xl flex items-start gap-2.5 text-xs sm:text-sm ${
+                      selectedOption === currentQuestion.correct_answer
+                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-300'
+                        : 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border border-rose-300'
+                    }`}>
+                      <span className="text-base">{selectedOption === currentQuestion.correct_answer ? '🎉' : '💡'}</span>
+                      <div>
+                        <strong>{selectedOption === currentQuestion.correct_answer ? 'Chính xác 100%! (+20 XP, +10 Coins)' : 'Chưa chính xác!'}</strong>
+                        <p className="mt-0.5">{currentQuestion.explanation}</p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setSelectedOption(null);
+                        setIsAnswerSubmitted(false);
+                      }}
+                      className="text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline"
+                    >
+                      🔄 Thử làm lại câu hỏi này
+                    </button>
+                  </div>
+                )}
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* Section 4: BÀI TẬP VẬN DỤNG & THỰC HÀNH (PRACTICE HOMEWORK) */}
+        {currentAssignment && (
+          <div className="space-y-4 pt-2">
+            <div className={`flex items-center gap-2 pb-2 border-b ${currentTheme.cardBorder}`}>
+              <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
+              <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wide">
+                4. Bài Tập Vận Dụng & Thực Hành (Nộp Bài Cho Cô Đỗ Mừng)
+              </h4>
+            </div>
+
+            <div className={`p-5 sm:p-6 rounded-3xl border-2 space-y-4 bg-white dark:bg-slate-900 ${currentTheme.cardBorder}`}>
+              <div>
+                <h5 className="text-sm sm:text-base font-black text-slate-900 dark:text-white">
+                  📝 {currentAssignment.title}
+                </h5>
+                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 mt-1 leading-relaxed">
+                  {currentAssignment.description}
+                </p>
+              </div>
+
+              {/* Rubric criteria */}
+              {currentAssignment.rubric && currentAssignment.rubric.length > 0 && (
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs space-y-1.5">
+                  <div className="font-bold text-slate-800 dark:text-white flex items-center gap-1.5">
+                    <Award className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Thang điểm đánh giá của Cô Đỗ Mừng (Tổng 100 điểm):</span>
+                  </div>
+                  <ul className="list-disc list-inside space-y-1 text-slate-600 dark:text-slate-300">
+                    {currentAssignment.rubric.map((r, i) => (
+                      <li key={i}>{r.criteria} ({r.points} điểm)</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Submit Form */}
+              {!isHomeworkSubmitted ? (
+                <form onSubmit={handleSubmitHomework} className="space-y-2.5 pt-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                    ✍️ Nhập câu trả lời hoặc bài làm của em:
+                  </label>
+                  <textarea
+                    value={homeworkText}
+                    onChange={(e) => setHomeworkText(e.target.value)}
+                    placeholder="Em viết lời giải hoặc nội dung bài tập thực hành vào đây..."
+                    rows={3}
+                    className="w-full p-3.5 rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs sm:text-sm focus:border-pinkBrand-500 focus:outline-none transition-colors"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!homeworkText.trim()}
+                    className={`px-5 py-2.5 rounded-full font-black text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-md ${
+                      homeworkText.trim()
+                        ? `${currentTheme.buttonPrimary} hover:scale-105`
+                        : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                    }`}
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Nộp Bài Cho Cô Đỗ Mừng 🌸</span>
+                  </button>
+                </form>
+              ) : (
+                <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 text-emerald-800 dark:text-emerald-300 text-xs sm:text-sm font-bold flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+                  <span>🎉 Đã nộp bài thành công! Cô Đỗ Mừng sẽ gửi điểm và lời khen cho em sớm nhé! 💖</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 5. FLOATING MASCOT SPEECH BUBBLE */}
         <div className="flex items-end justify-end gap-3 pt-4">
           {/* Speech Bubble */}
           <div className="relative p-3.5 px-4 rounded-3xl bg-white dark:bg-[#1A1E33] border-2 border-pink-300 dark:border-pink-800 shadow-md max-w-xs sm:max-w-md text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 leading-snug">
@@ -376,7 +630,7 @@ export const LessonContent: React.FC = () => {
           </div>
         </div>
 
-        {/* 4. BOTTOM ACTION & NAVIGATION BAR */}
+        {/* 6. BOTTOM ACTION & NAVIGATION BAR */}
         <div className={`pt-6 border-t ${currentTheme.cardBorder} flex flex-col sm:flex-row items-center justify-between gap-4`}>
           
           {/* Complete Lesson Button */}
