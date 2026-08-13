@@ -115,7 +115,7 @@ export const fetchTopicsFromSupabase = async (): Promise<Tin6Topic[]> => {
       .select('*')
       .order('lesson_number', { ascending: true });
 
-    if (lessonsErr || !lessonsData || lessonsData.length === 0) {
+    if (lessonsErr || !lessonsData || lessonsData.length < 17) {
       return TIN6_TOPICS;
     }
 

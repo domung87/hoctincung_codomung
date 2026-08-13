@@ -110,15 +110,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem('tinhoc6_topics', JSON.stringify(topics));
   }, [topics]);
 
-  // Find active lesson across all topics
-  let activeLesson: Tin6Lesson = topics[0].lessons[0];
-  for (const topic of topics) {
-    const found = topic.lessons.find(l => l.id === selectedLessonId);
-    if (found) {
-      activeLesson = found;
-      break;
-    }
-  }
+  // Find active lesson across all topics with solid fallback
+  const allLessons = (topics && topics.length > 0) 
+    ? topics.flatMap(t => t.lessons || []) 
+    : TIN6_TOPICS.flatMap(t => t.lessons);
+    
+  const activeLesson: Tin6Lesson = allLessons.find(l => l.id === selectedLessonId) || allLessons[0] || TIN6_TOPICS[0].lessons[0];
 
   // Voice greeting synthesis
   const playCoDoMungGreeting = () => {
