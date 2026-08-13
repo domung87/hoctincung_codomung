@@ -5,10 +5,27 @@ import { INITIAL_PROFILES } from '../lib/mockData';
 import { updateProfileInSupabase } from '../lib/supabase';
 import { sound } from '../lib/soundFx';
 
-export type AuthMode = 'teacher_login' | 'student_login' | 'student_register';
+export type AuthMode = 'google_login' | 'student_login' | 'student_register' | 'teacher_login';
 
 // EMAIL DUY NHẤT ĐƯỢC PHÉP TRUY CẬP VAI TRÒ GIÁO VIÊN CÔ ĐỖ MỪNG
 export const TEACHER_OFFICIAL_EMAIL = 'dothimung87@gmail.com';
+export const TEACHER_ALT_EMAIL = 'dothimung@gmail.com';
+
+// Danh sách học sinh mẫu để tạo tài khoản Gmail ngẫu nhiên
+const RANDOM_STUDENTS_POOL = [
+  { name: 'Nguyễn Gia Bảo', class: '6A1', prefix: 'giabao' },
+  { name: 'Đặng Mai Linh', class: '6A2', prefix: 'mailinh' },
+  { name: 'Trần Minh Ánh', class: '6A1', prefix: 'minhanh' },
+  { name: 'Lê Hoàng Nam', class: '6A3', prefix: 'hoangnam' },
+  { name: 'Phạm Thu Thảo', class: '6A2', prefix: 'thuthao' },
+  { name: 'Vũ Minh Đức', class: '6A4', prefix: 'minhduc' },
+  { name: 'Bùi Duy Anh', class: '6A1', prefix: 'duyanh' },
+  { name: 'Ngô Phương Nhi', class: '6A5', prefix: 'phuongnhi' },
+  { name: 'Đỗ Tuấn Kiệt', class: '6A6', prefix: 'tuankiet' },
+  { name: 'Hoàng Bảo Ngọc', class: '6A2', prefix: 'baongoc' },
+  { name: 'Nguyễn Tiến Dũng', class: '6A7', prefix: 'tiendung' },
+  { name: 'Lê Khánh Huyền', class: '6A8', prefix: 'khanhhuyen' }
+];
 
 interface AuthContextType {
   currentUser: UserProfile;
@@ -21,6 +38,8 @@ interface AuthContextType {
   openAuthModal: (mode?: AuthMode) => void;
   
   // Auth actions
+  loginWithGoogle: (email: string) => Promise<{ success: boolean; message: string; user?: UserProfile }>;
+  loginRandomGmail: () => Promise<{ success: boolean; message: string; user?: UserProfile }>;
   loginTeacherWithGoogle: (gmail: string) => Promise<{ success: boolean; message: string }>;
   registerStudent: (
     fullName: string, 
@@ -42,9 +61,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const STORAGE_KEY_PROFILES = 'tinhoc6_profiles_v3';
-const STORAGE_KEY_CURRENT_USER_ID = 'tinhoc6_current_user_id_v3';
-const STORAGE_KEY_IS_LOGGED_IN = 'tinhoc6_is_logged_in_v3';
+const STORAGE_KEY_PROFILES = 'tinhoc6_profiles_v4';
+const STORAGE_KEY_CURRENT_USER_ID = 'tinhoc6_current_user_id_v4';
+const STORAGE_KEY_IS_LOGGED_IN = 'tinhoc6_is_logged_in_v4';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [profiles, setProfiles] = useState<UserProfile[]>(() => {
@@ -52,7 +71,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        // Ensure teacher email is updated to dothimung87@gmail.com
         return parsed.map((p: UserProfile) => 
           p.role === 'teacher' ? { ...p, email: TEACHER_OFFICIAL_EMAIL, full_name: 'Cô Đỗ Thị Mừng' } : p
         );
@@ -63,9 +81,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return INITIAL_PROFILES;
   });
 
+  // MẶC ĐỊNH KHÔNG ĐỂ TÀI KHOẢN GIÁO VIÊN CÔ ĐỖ MỪNG NỮA, MÀ MẶC ĐỊNH LÀ HỌC SINH
   const [currentUserId, setCurrentUserId] = useState<string>(() => {
     const saved = localStorage.getItem(STORAGE_KEY_CURRENT_USER_ID);
-    return saved || 'teacher-co-do-mung';
+    return saved || 'student-em-hoc-sinh';
   });
 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
@@ -75,7 +94,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Modal State
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authModalMode, setAuthModalMode] = useState<AuthMode>('student_login');
+  const [authModalMode, setAuthModalMode] = useState<AuthMode>('google_login');
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_PROFILES, JSON.stringify(profiles));
@@ -89,68 +108,142 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem(STORAGE_KEY_IS_LOGGED_IN, String(isLoggedIn));
   }, [isLoggedIn]);
 
-  const currentUser = profiles.find(p => p.id === currentUserId) || profiles[0];
+  const currentUser = profiles.find(p => p.id === currentUserId) || profiles[0] || INITIAL_PROFILES[1];
 
-  const openAuthModal = (mode: AuthMode = 'student_login') => {
+  const openAuthModal = (mode: AuthMode = 'google_login') => {
     sound.click();
     setAuthModalMode(mode);
     setIsAuthModalOpen(true);
   };
 
-  // 1. GIÁO VIÊN ĐĂNG NHẬP: CHỈ CHO PHÉP DUY NHẤT TÀI KHOẢN dothimung87@gmail.com
-  const loginTeacherWithGoogle = async (gmail: string): Promise<{ success: boolean; message: string }> => {
+  // 1. ĐĂNG NHẬP VỚI GOOGLE (BẰNG BẤT KỲ GMAIL NÀO)
+  const loginWithGoogle = async (email: string): Promise<{ success: boolean; message: string; user?: UserProfile }> => {
     sound.click();
-    const cleanEmail = gmail.trim().toLowerCase();
-    
+    const cleanEmail = email.trim().toLowerCase();
+
     if (!cleanEmail || !cleanEmail.includes('@')) {
-      return { success: false, message: 'Vui lòng nhập địa chỉ Gmail hợp lệ.' };
+      return { success: false, message: 'Vui lòng nhập hoặc chọn một địa chỉ Gmail hợp lệ.' };
     }
 
-    // KIỂM TRA BẢO MẬT: CHỈ DUY NHẤT dothimung87@gmail.com MỚI ĐƯỢC MỞ
-    if (cleanEmail !== TEACHER_OFFICIAL_EMAIL) {
-      sound.wrong();
+    // Nếu là Gmail chính thức của Cô Đỗ Mừng
+    if (cleanEmail === TEACHER_OFFICIAL_EMAIL || cleanEmail === TEACHER_ALT_EMAIL) {
+      let teacher = profiles.find(p => p.role === 'teacher' && (p.email.toLowerCase() === TEACHER_OFFICIAL_EMAIL || p.email.toLowerCase() === TEACHER_ALT_EMAIL));
+
+      if (!teacher) {
+        teacher = {
+          id: 'teacher-co-do-mung',
+          email: TEACHER_OFFICIAL_EMAIL,
+          full_name: 'Cô Đỗ Thị Mừng',
+          role: 'teacher',
+          classroom: 'Khối 6',
+          username: 'dothimung87',
+          password: '123',
+          avatar_url: '/images/avatar_co_mung.jpg',
+          bio: 'Giáo viên Giảng dạy Tin học 6 - Bộ Sách Kết Nối Tri Thức Với Cuộc Sống 💖',
+          xp: 9999,
+          level: 25,
+          coins: 5000,
+          streak_days: 90,
+          created_at: new Date().toISOString()
+        };
+        setProfiles(prev => [teacher!, ...prev.filter(p => p.id !== teacher!.id)]);
+        updateProfileInSupabase(teacher);
+      }
+
+      setCurrentUserId(teacher.id);
+      setIsLoggedIn(true);
+      sound.victory();
+      confetti({ particleCount: 100, spread: 80, origin: { y: 0.4 } });
       return { 
-        success: false, 
-        message: `Quyền truy cập bị từ chối! Chỉ tài khoản Gmail chính thức của Cô Đỗ Mừng (${TEACHER_OFFICIAL_EMAIL}) mới có quyền mở giao diện Giáo viên quản trị!` 
+        success: true, 
+        message: `Chào mừng Cô Đỗ Thị Mừng (${TEACHER_OFFICIAL_EMAIL}) đã đăng nhập vào Hệ thống Quản Trị Giáo Viên!`,
+        user: teacher
       };
     }
 
-    let teacher = profiles.find(p => p.role === 'teacher' && p.email.toLowerCase() === TEACHER_OFFICIAL_EMAIL);
+    // Nếu là Gmail của Học sinh (hoặc người dùng khác)
+    let student = profiles.find(p => p.email.toLowerCase() === cleanEmail);
 
-    if (!teacher) {
-      // Khởi tạo tài khoản Giáo viên chuẩn
-      const newTeacher: UserProfile = {
-        id: 'teacher-co-do-mung',
-        email: TEACHER_OFFICIAL_EMAIL,
-        full_name: 'Cô Đỗ Thị Mừng',
-        role: 'teacher',
-        classroom: 'Khối 6',
-        username: 'dothimung87',
+    if (!student) {
+      const emailPrefix = cleanEmail.split('@')[0];
+      const randomSeed = Math.floor(100 + Math.random() * 900);
+      const newStudent: UserProfile = {
+        id: 'google-student-' + Date.now(),
+        email: cleanEmail,
+        full_name: 'Học sinh ' + emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1),
+        classroom: 'Lớp 6A' + (Math.floor(Math.random() * 6) + 1),
+        username: emailPrefix + randomSeed,
         password: '123',
-        avatar_url: '/images/avatar_co_mung.jpg',
-        bio: 'Giáo viên Giảng dạy Tin học 6 - Bộ Sách Kết Nối Tri Thức Với Cuộc Sống 💖',
-        xp: 9999,
-        level: 25,
-        coins: 5000,
-        streak_days: 90,
+        role: 'student',
+        avatar_url: `https://api.dicebear.com/7.x/bottts/svg?seed=${cleanEmail}`,
+        bio: `Học sinh Tin học 6 - Đăng nhập qua tài khoản Google (${cleanEmail}) 🌸`,
+        xp: 150,
+        level: 1,
+        coins: 50,
+        streak_days: 1,
         created_at: new Date().toISOString()
       };
-      setProfiles(prev => [newTeacher, ...prev.filter(p => p.id !== newTeacher.id)]);
-      teacher = newTeacher;
-      updateProfileInSupabase(newTeacher);
+      setProfiles(prev => [newStudent, ...prev]);
+      student = newStudent;
+      updateProfileInSupabase(newStudent);
     }
 
-    setCurrentUserId(teacher.id);
+    setCurrentUserId(student.id);
     setIsLoggedIn(true);
     sound.victory();
-    confetti({ particleCount: 100, spread: 80, origin: { y: 0.4 } });
-    return { 
-      success: true, 
-      message: `Chào mừng Cô Đỗ Thị Mừng (${TEACHER_OFFICIAL_EMAIL}) đã đăng nhập thành công vào Hệ thống Quản Trị Giáo Viên!` 
+    confetti({ particleCount: 90, spread: 70 });
+    return {
+      success: true,
+      message: `Đăng nhập Google thành công! Chào mừng ${student.full_name} (${student.email}) đã vào học Tin học 6.`,
+      user: student
     };
   };
 
-  // 2. HỌC SINH ĐĂNG KÝ (HỌ TÊN, LỚP, TÊN ĐĂNG NHẬP, MẬT KHẨU, AVATAR)
+  // 2. ĐĂNG NHẬP NGẪU NHIÊN BẰNG GMAIL (RANDOM GMAIL LOGIN)
+  const loginRandomGmail = async (): Promise<{ success: boolean; message: string; user?: UserProfile }> => {
+    sound.click();
+    const randomTemplate = RANDOM_STUDENTS_POOL[Math.floor(Math.random() * RANDOM_STUDENTS_POOL.length)];
+    const randomDigits = Math.floor(1000 + Math.random() * 9000);
+    const generatedGmail = `${randomTemplate.prefix}.${randomDigits}@gmail.com`;
+
+    const newRandomStudent: UserProfile = {
+      id: 'student-random-' + Date.now(),
+      email: generatedGmail,
+      full_name: randomTemplate.name,
+      classroom: randomTemplate.class,
+      username: `${randomTemplate.prefix}${randomDigits}`,
+      password: '123',
+      role: 'student',
+      avatar_url: `https://api.dicebear.com/7.x/bottts/svg?seed=${randomTemplate.prefix}${randomDigits}`,
+      bio: `Học sinh ${randomTemplate.class} - Đăng nhập ngẫu nhiên bằng Google Gmail (${generatedGmail}) 🚀`,
+      xp: 120,
+      level: 1,
+      coins: 60,
+      streak_days: 1,
+      created_at: new Date().toISOString()
+    };
+
+    setProfiles(prev => [newRandomStudent, ...prev]);
+    setCurrentUserId(newRandomStudent.id);
+    setIsLoggedIn(true);
+    sound.victory();
+    confetti({ particleCount: 110, spread: 85, origin: { y: 0.5 } });
+
+    updateProfileInSupabase(newRandomStudent);
+
+    return {
+      success: true,
+      message: `🎉 Đã tạo và đăng nhập thành công tài khoản Gmail ngẫu nhiên: ${newRandomStudent.full_name} (${newRandomStudent.email})!`,
+      user: newRandomStudent
+    };
+  };
+
+  // 3. GIÁO VIÊN ĐĂNG NHẬP (CHỈ DUY NHẤT dothimung87@gmail.com)
+  const loginTeacherWithGoogle = async (gmail: string): Promise<{ success: boolean; message: string }> => {
+    return loginWithGoogle(gmail);
+  };
+
+  // 4. HỌC SINH ĐĂNG KÝ
   const registerStudent = async (
     fullName: string, 
     classroom: string, 
@@ -184,7 +277,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const newStudent: UserProfile = {
       id: 'student-' + Date.now(),
-      email: `${cleanUser}@hocsinh.tin6.edu.vn`,
+      email: `${cleanUser}@gmail.com`,
       full_name: cleanName,
       classroom: cleanClass,
       username: cleanUser,
@@ -205,7 +298,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     sound.victory();
     confetti({ particleCount: 120, spread: 90, origin: { y: 0.5 } });
 
-    // Sync to Supabase in background
     updateProfileInSupabase(newStudent);
 
     return { 
@@ -214,7 +306,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   };
 
-  // 3. HỌC SINH ĐĂNG NHẬP (TÊN ĐĂNG NHẬP HOẶC HỌ TÊN VÀ MẬT KHẨU)
+  // 5. HỌC SINH ĐĂNG NHẬP
   const loginStudent = async (usernameOrName: string, password: string): Promise<{ success: boolean; message: string }> => {
     sound.click();
     const cleanQuery = usernameOrName.trim().toLowerCase();
@@ -237,7 +329,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       sound.wrong();
       return { 
         success: false, 
-        message: 'Không tìm thấy tài khoản học sinh phù hợp. Em vui lòng kiểm tra lại Tên đăng nhập hoặc bấm Đăng Ký Tài Khoản Mới nhé!' 
+        message: 'Không tìm thấy tài khoản học sinh phù hợp. Em vui lòng kiểm tra lại hoặc bấm Đăng Nhập Với Google / Đăng Ký nhé!' 
       };
     }
 
@@ -264,13 +356,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const switchRole = (role: UserRole) => {
     sound.click();
     if (role === 'teacher') {
-      // Chỉ cho phép chuyển sang giáo viên nếu có tài khoản dothimung87@gmail.com
       const teacher = profiles.find(p => p.role === 'teacher' && p.email.toLowerCase() === TEACHER_OFFICIAL_EMAIL);
       if (teacher) {
         setCurrentUserId(teacher.id);
         setIsLoggedIn(true);
       } else {
-        openAuthModal('teacher_login');
+        openAuthModal('google_login');
       }
     } else {
       const target = profiles.find(p => p.role === role);
@@ -308,7 +399,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         level: newLevel
       };
 
-      // Sync to Supabase
       updateProfileInSupabase(updated);
       return updated;
     }));
@@ -347,6 +437,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       authModalMode,
       setAuthModalMode,
       openAuthModal,
+      loginWithGoogle,
+      loginRandomGmail,
       loginTeacherWithGoogle,
       registerStudent,
       loginStudent,

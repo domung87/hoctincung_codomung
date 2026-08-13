@@ -227,7 +227,7 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* User Profile Pill OR Login Button */}
-          {!isLoggedIn ? (
+              {!isLoggedIn ? (
             <div className="flex items-center gap-2">
               <button
                 onClick={() => openAuthModal('student_register')}
@@ -238,11 +238,11 @@ export const Navbar: React.FC = () => {
               </button>
 
               <button
-                onClick={() => openAuthModal('teacher_login')}
+                onClick={() => openAuthModal('google_login')}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md transition-all hover:scale-105"
               >
                 <LogIn className="w-4 h-4" />
-                <span>🔐 Đăng Nhập</span>
+                <span>🔐 Đăng Nhập / Google</span>
               </button>
             </div>
           ) : (
@@ -284,7 +284,7 @@ export const Navbar: React.FC = () => {
                     <div className="text-xs font-extrabold text-slate-800 dark:text-white">
                       {currentUser.full_name}
                     </div>
-                    <div className="text-[11px] text-slate-400 mt-0.5">
+                    <div className="text-[11px] text-slate-400 mt-0.5 truncate">
                       {currentUser.email}
                     </div>
                     <div className="mt-2 flex items-center justify-between text-[11px] font-bold text-blue-600">
@@ -297,12 +297,12 @@ export const Navbar: React.FC = () => {
                     <button
                       onClick={() => {
                         setIsUserDropdownOpen(false);
-                        openAuthModal('teacher_login');
+                        openAuthModal('google_login');
                       }}
                       className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-800 flex items-center gap-2"
                     >
                       <ShieldCheck className="w-4 h-4 text-blue-600" />
-                      <span>Đăng nhập Gmail Giáo Viên</span>
+                      <span>Đăng nhập Google / Gmail</span>
                     </button>
 
                     <button
@@ -313,7 +313,7 @@ export const Navbar: React.FC = () => {
                       className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-800 flex items-center gap-2"
                     >
                       <GraduationCap className="w-4 h-4 text-amber-500" />
-                      <span>Đăng nhập / Đổi tài khoản Học sinh</span>
+                      <span>Đăng nhập tài khoản Học sinh</span>
                     </button>
 
                     <button

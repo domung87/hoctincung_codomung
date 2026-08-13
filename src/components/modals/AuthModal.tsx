@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { 
   X, 
   GraduationCap, 
-  UserCheck, 
   Lock, 
   Mail, 
   User, 
@@ -15,8 +14,9 @@ import {
   EyeOff,
   UserPlus,
   KeyRound,
-  Award,
-  Check
+  Check,
+  Dices,
+  Globe
 } from 'lucide-react';
 import { useAuth, AuthMode, TEACHER_OFFICIAL_EMAIL } from '../../context/AuthContext';
 import { sound } from '../../lib/soundFx';
@@ -36,13 +36,14 @@ export const AuthModal: React.FC = () => {
     setIsAuthModalOpen, 
     authModalMode, 
     setAuthModalMode,
-    loginTeacherWithGoogle,
+    loginWithGoogle,
+    loginRandomGmail,
     registerStudent,
     loginStudent
   } = useAuth();
 
-  // Teacher Login state
-  const [teacherEmail, setTeacherEmail] = useState(TEACHER_OFFICIAL_EMAIL);
+  // Custom Gmail input (Google Login)
+  const [customGmail, setCustomGmail] = useState('');
   
   // Student Login state
   const [studentLoginUser, setStudentLoginUser] = useState('');
@@ -58,12 +59,16 @@ export const AuthModal: React.FC = () => {
   const [showRegPassword, setShowRegPassword] = useState(false);
   const [selectedAvatarUrl, setSelectedAvatarUrl] = useState(STUDENT_AVATARS[0].url);
 
+  // Google Account Chooser Dialog state
+  const [isGoogleChooserOpen, setIsGoogleChooserOpen] = useState(false);
+
   // Feedback status
   const [statusMsg, setStatusMsg] = useState<{ success: boolean; text: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setStatusMsg(null);
+    setIsGoogleChooserOpen(false);
   }, [authModalMode, isAuthModalOpen]);
 
   // Tự động tạo gợi ý tên đăng nhập không dấu khi học sinh gõ Họ và tên
@@ -84,26 +89,44 @@ export const AuthModal: React.FC = () => {
 
   if (!isAuthModalOpen) return null;
 
-  // 1. Xử lý Giáo Viên Đăng Nhập
-  const handleTeacherLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // 1. Xử lý Đăng Nhập Với Google (Google OAuth / Gmail)
+  const handleGoogleLogin = async (emailToLogin: string) => {
+    if (!emailToLogin.trim()) return;
     setIsLoading(true);
     setStatusMsg(null);
 
-    const res = await loginTeacherWithGoogle(teacherEmail);
+    const res = await loginWithGoogle(emailToLogin);
     setIsLoading(false);
 
     if (res.success) {
       setStatusMsg({ success: true, text: res.message });
       setTimeout(() => {
         setIsAuthModalOpen(false);
-      }, 1000);
+      }, 1100);
     } else {
       setStatusMsg({ success: false, text: res.message });
     }
   };
 
-  // 2. Xử lý Học Sinh Đăng Nhập
+  // 2. Xử lý Đăng Nhập Ngẫu Nhiên Bằng Gmail
+  const handleRandomGmailLogin = async () => {
+    setIsLoading(true);
+    setStatusMsg(null);
+
+    const res = await loginRandomGmail();
+    setIsLoading(false);
+
+    if (res.success) {
+      setStatusMsg({ success: true, text: res.message });
+      setTimeout(() => {
+        setIsAuthModalOpen(false);
+      }, 1100);
+    } else {
+      setStatusMsg({ success: false, text: res.message });
+    }
+  };
+
+  // 3. Xử lý Học Sinh Đăng Nhập (Username/Password)
   const handleStudentLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -122,7 +145,7 @@ export const AuthModal: React.FC = () => {
     }
   };
 
-  // 3. Xử lý Học Sinh Đăng Ký
+  // 4. Xử lý Học Sinh Đăng Ký
   const handleStudentRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -178,12 +201,28 @@ export const AuthModal: React.FC = () => {
             Cùng Học Tin 6 💖
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-            Trang học tập và thi đua Tin học 6 - Cô Đỗ Mừng
+            Đăng nhập qua Google Gmail hoặc Tài khoản Học sinh
           </p>
         </div>
 
-        {/* Mode Selector Tabs (3 TABS: Học Sinh Đăng Nhập / Học Sinh Đăng Ký / Giáo Viên Gmail) */}
+        {/* Mode Selector Tabs */}
         <div className="flex bg-pink-50 dark:bg-slate-800/80 p-1.5 rounded-2xl mb-5 gap-1">
+          <button
+            type="button"
+            onClick={() => {
+              sound.click();
+              setAuthModalMode('google_login');
+            }}
+            className={`flex-1 py-2 sm:py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
+              authModalMode === 'google_login'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-300 hover:text-blue-600'
+            }`}
+          >
+            <Globe className="w-3.5 h-3.5" />
+            <span>Google Gmail</span>
+          </button>
+
           <button
             type="button"
             onClick={() => {
@@ -196,7 +235,7 @@ export const AuthModal: React.FC = () => {
                 : 'text-slate-600 dark:text-slate-300 hover:text-pinkBrand-600'
             }`}
           >
-            <span>🎒 Đăng Nhập</span>
+            <span>🎒 Học Sinh</span>
           </button>
 
           <button
@@ -212,21 +251,6 @@ export const AuthModal: React.FC = () => {
             }`}
           >
             <span>📝 Đăng Ký</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              sound.click();
-              setAuthModalMode('teacher_login');
-            }}
-            className={`flex-1 py-2 sm:py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1 ${
-              authModalMode === 'teacher_login'
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-300 hover:text-blue-600'
-            }`}
-          >
-            <span>👩‍🏫 Giáo Viên</span>
           </button>
         </div>
 
@@ -247,7 +271,136 @@ export const AuthModal: React.FC = () => {
         )}
 
         {/* =========================================================================
-            TAB 1: HỌC SINH ĐĂNG NHẬP
+            TAB 1: ĐĂNG NHẬP VỚI GOOGLE (GMAIL NGẪU NHIÊN HOẶC NHẬP GMAIL BẤT KỲ)
+            ========================================================================= */}
+        {authModalMode === 'google_login' && (
+          <div className="space-y-4 animate-in fade-in">
+            
+            {/* 1. Nút Đăng Nhập Với Google Chuẩn (Google Button) */}
+            <button
+              type="button"
+              disabled={isLoading}
+              onClick={() => setIsGoogleChooserOpen(!isGoogleChooserOpen)}
+              className="w-full py-3.5 px-4 rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/80 text-slate-800 dark:text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-3 shadow-sm hover:shadow-md transition-all hover:scale-[1.01]"
+            >
+              {/* Google 4-Color SVG Logo */}
+              <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                />
+              </svg>
+              <span>{isLoading ? 'Đang kết nối Google...' : 'Đăng Nhập Với Google (Chọn tài khoản)'}</span>
+            </button>
+
+            {/* 2. Nút Đăng Nhập Nhanh Bằng Gmail Ngẫu Nhiên */}
+            <button
+              type="button"
+              disabled={isLoading}
+              onClick={handleRandomGmailLogin}
+              className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-pinkBrand-500 hover:from-amber-600 hover:to-pinkBrand-600 text-white font-black text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
+            >
+              <Dices className="w-4 h-4 animate-spin-slow" />
+              <span>🎲 Đăng Nhập Ngẫu Nhiên Bằng Gmail Mới (+120 XP)</span>
+            </button>
+
+            {/* Popup / Danh Sách Chọn Tài Khoản Google Nhanh */}
+            {isGoogleChooserOpen && (
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/90 border border-blue-200 dark:border-slate-700 space-y-2 animate-in fade-in">
+                <div className="text-[11px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-1">
+                  Chọn tài khoản Google để tiếp tục:
+                </div>
+
+                {/* Tài khoản Giáo Viên Cô Đỗ Mừng */}
+                <div
+                  onClick={() => handleGoogleLogin(TEACHER_OFFICIAL_EMAIL)}
+                  className="p-2.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-blue-50 dark:hover:bg-blue-950/40 border border-slate-200 dark:border-slate-700 cursor-pointer flex items-center justify-between transition-all group"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <img src="/images/avatar_co_mung.jpg" alt="Avatar" className="w-8 h-8 rounded-full object-cover border border-pink-200" />
+                    <div>
+                      <div className="text-xs font-black text-slate-800 dark:text-white group-hover:text-blue-600">
+                        Cô Đỗ Thị Mừng (Giáo viên)
+                      </div>
+                      <div className="text-[11px] text-slate-400">{TEACHER_OFFICIAL_EMAIL}</div>
+                    </div>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 font-extrabold text-[10px]">
+                    Giáo Viên 👑
+                  </span>
+                </div>
+
+                {/* Tài khoản Học Sinh Nguyễn Gia Bảo */}
+                <div
+                  onClick={() => handleGoogleLogin('giabao.student@gmail.com')}
+                  className="p-2.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-pink-50 dark:hover:bg-pink-950/40 border border-slate-200 dark:border-slate-700 cursor-pointer flex items-center justify-between transition-all group"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <img src="/images/student_boy.jpg" alt="Avatar" className="w-8 h-8 rounded-full object-cover border border-blue-200" />
+                    <div>
+                      <div className="text-xs font-black text-slate-800 dark:text-white group-hover:text-pinkBrand-600">
+                        Nguyễn Gia Bảo (Học sinh 6A1)
+                      </div>
+                      <div className="text-[11px] text-slate-400">giabao.student@gmail.com</div>
+                    </div>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 font-extrabold text-[10px]">
+                    Học Sinh 🎒
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Hoặc Nhập Bất Kỳ Địa Chỉ Gmail Nào */}
+            <div className="pt-1">
+              <div className="flex items-center gap-2 my-2 text-slate-400 text-[11px] font-bold">
+                <div className="flex-1 border-t border-slate-200 dark:border-slate-700" />
+                <span>HOẶC NHẬP GMAIL CỦA BẠN</span>
+                <div className="flex-1 border-t border-slate-200 dark:border-slate-700" />
+              </div>
+
+              <form onSubmit={(e) => { e.preventDefault(); handleGoogleLogin(customGmail); }} className="flex gap-2">
+                <div className="relative flex-1">
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                  <input
+                    type="email"
+                    required
+                    placeholder="Nhập địa chỉ Gmail bất kỳ..."
+                    value={customGmail}
+                    onChange={(e) => setCustomGmail(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md transition-all shrink-0"
+                >
+                  Vào Học 🚀
+                </button>
+              </form>
+              <p className="text-[11px] text-slate-400 mt-1.5 leading-tight">
+                💡 <em>Nhập <strong>{TEACHER_OFFICIAL_EMAIL}</strong> để mở quyền Giáo Viên, hoặc nhập bất kỳ Gmail nào khác để vào học với vai trò Học Sinh.</em>
+              </p>
+            </div>
+
+          </div>
+        )}
+
+        {/* =========================================================================
+            TAB 2: HỌC SINH ĐĂNG NHẬP (USERNAME/PASSWORD)
             ========================================================================= */}
         {authModalMode === 'student_login' && (
           <form onSubmit={handleStudentLogin} className="space-y-4 animate-in fade-in">
@@ -334,7 +487,7 @@ export const AuthModal: React.FC = () => {
         )}
 
         {/* =========================================================================
-            TAB 2: HỌC SINH ĐĂNG KÝ
+            TAB 3: HỌC SINH ĐĂNG KÝ
             ========================================================================= */}
         {authModalMode === 'student_register' && (
           <form onSubmit={handleStudentRegister} className="space-y-3.5 animate-in fade-in">
@@ -416,7 +569,7 @@ export const AuthModal: React.FC = () => {
                   placeholder="Tối thiểu 4 ký tự..."
                   value={regPassword}
                   onChange={(e) => setRegPassword(e.target.value)}
-                  className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold outline-none focus:ring-2 focus:ring-pinkBrand-400 text-slate-900 dark:text-white"
+                  className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-semibold outline-none focus:ring-2 focus:ring-pinkBrand-400 text-slate-900 dark:text-white"
                 />
               </div>
 
@@ -430,7 +583,7 @@ export const AuthModal: React.FC = () => {
                   placeholder="Nhập lại mật khẩu..."
                   value={regConfirmPassword}
                   onChange={(e) => setRegConfirmPassword(e.target.value)}
-                  className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold outline-none focus:ring-2 focus:ring-pinkBrand-400 text-slate-900 dark:text-white"
+                  className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-semibold outline-none focus:ring-2 focus:ring-pinkBrand-400 text-slate-900 dark:text-white"
                 />
               </div>
             </div>
@@ -505,71 +658,6 @@ export const AuthModal: React.FC = () => {
                 className="text-xs font-black text-pinkBrand-600 hover:underline ml-1"
               >
                 👉 Đăng nhập tại đây
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* =========================================================================
-            TAB 3: GIÁO VIÊN ĐĂNG NHẬP (CHỈ CHO PHÉP dothimung87@gmail.com)
-            ========================================================================= */}
-        {authModalMode === 'teacher_login' && (
-          <form onSubmit={handleTeacherLogin} className="space-y-4 animate-in fade-in">
-            {/* Alert Box Bảo Mật */}
-            <div className="p-3.5 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-xs text-blue-800 dark:text-blue-200 leading-relaxed font-medium flex items-start gap-2.5">
-              <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-              <div>
-                <strong className="font-extrabold text-blue-900 dark:text-white block">🔒 Khu vực Bảo mật Giáo Viên:</strong>
-                Chỉ duy nhất tài khoản Gmail chính thức của Cô Đỗ Mừng (<strong>{TEACHER_OFFICIAL_EMAIL}</strong>) mới được phép mở quyền Quản Trị Giáo Viên & Sổ Chấm Điểm!
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5 text-blue-600" />
-                <span>Nhập địa chỉ Gmail Giáo Viên:</span>
-              </label>
-              <input
-                type="email"
-                required
-                placeholder="dothimung87@gmail.com"
-                value={teacherEmail}
-                onChange={(e) => setTeacherEmail(e.target.value)}
-                className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white"
-              />
-            </div>
-
-            {/* Quick Fill Official Email */}
-            <div className="flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => setTeacherEmail(TEACHER_OFFICIAL_EMAIL)}
-                className="text-[11px] font-extrabold text-blue-600 hover:underline flex items-center gap-1"
-              >
-                ⚡ Sử dụng Gmail chính thức: {TEACHER_OFFICIAL_EMAIL}
-              </button>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
-            >
-              <ShieldCheck className="w-4 h-4" />
-              <span>{isLoading ? 'Đang xác thực quyền giáo viên...' : '🔐 Mở Khóa Quyền Quản Trị Giáo Viên'}</span>
-            </button>
-
-            <div className="text-center pt-2 border-t border-slate-100 dark:border-slate-800">
-              <span className="text-xs text-slate-400">Em là học sinh? </span>
-              <button
-                type="button"
-                onClick={() => {
-                  sound.click();
-                  setAuthModalMode('student_login');
-                }}
-                className="text-xs font-black text-blue-600 hover:underline ml-1"
-              >
-                Quay lại Đăng nhập Học Sinh
               </button>
             </div>
           </form>
