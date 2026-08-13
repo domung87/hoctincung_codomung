@@ -385,42 +385,65 @@ export const LessonContent: React.FC = () => {
 
             {/* Interactive Tabs Switcher */}
             <div className="flex flex-wrap gap-2">
-              {activeLesson.components.map((comp, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    sound.click();
-                    setSelectedCompIndex(idx);
-                  }}
-                  className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all border-2 ${
-                    selectedCompIndex === idx
-                      ? currentTheme.tabActive
-                      : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-current'
-                  }`}
-                >
-                  {comp.title.split(':')[0]}
-                </button>
-              ))}
+              {activeLesson.components.map((comp: any, idx) => {
+                const titleStr = comp?.title || comp?.name || `Mục ${idx + 1}`;
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      sound.click();
+                      setSelectedCompIndex(idx);
+                    }}
+                    className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all border-2 ${
+                      selectedCompIndex === idx
+                        ? currentTheme.tabActive
+                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-current'
+                    }`}
+                  >
+                    {titleStr.split(':')[0]}
+                  </button>
+                );
+              })}
             </div>
 
-            {activeLesson.components[selectedCompIndex] && (
-              <div className={`p-5 rounded-3xl border-2 space-y-2.5 animate-in fade-in ${currentTheme.cardBg} ${currentTheme.cardBorder}`}>
-                <h5 className={`text-sm font-black ${currentTheme.titleColor}`}>
-                  {activeLesson.components[selectedCompIndex].title}
-                </h5>
-                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                  {activeLesson.components[selectedCompIndex].description}
-                </p>
-                <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs space-y-1">
-                  <div className="font-bold text-slate-800 dark:text-white">
-                    ⚙️ <strong>Chức năng:</strong> {activeLesson.components[selectedCompIndex].functionText}
-                  </div>
-                  <div className={`font-semibold ${currentTheme.textColor}`}>
-                    💡 <strong>Ví dụ thực tế:</strong> {activeLesson.components[selectedCompIndex].example}
-                  </div>
+            {(() => {
+              const activeComp = (activeLesson.components && activeLesson.components[selectedCompIndex]) 
+                ? (activeLesson.components[selectedCompIndex] as any)
+                : (activeLesson.components && activeLesson.components[0] as any);
+              if (!activeComp) return null;
+
+              const titleText = activeComp.title || activeComp.name || 'Khám phá kiến thức';
+              const descText = activeComp.description || activeComp.desc || '';
+              const funcText = activeComp.functionText || activeComp.function || '';
+              const exampleText = activeComp.example || '';
+
+              return (
+                <div className={`p-5 rounded-3xl border-2 space-y-2.5 animate-in fade-in ${currentTheme.cardBg} ${currentTheme.cardBorder}`}>
+                  <h5 className={`text-sm font-black ${currentTheme.titleColor}`}>
+                    {titleText}
+                  </h5>
+                  {descText && (
+                    <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                      {descText}
+                    </p>
+                  )}
+                  {(funcText || exampleText) && (
+                    <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs space-y-1">
+                      {funcText && (
+                        <div className="font-bold text-slate-800 dark:text-white">
+                          ⚙️ <strong>Chức năng:</strong> {funcText}
+                        </div>
+                      )}
+                      {exampleText && (
+                        <div className={`font-semibold ${currentTheme.textColor}`}>
+                          💡 <strong>Ví dụ thực tế:</strong> {exampleText}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
         )}
 
@@ -446,7 +469,7 @@ export const LessonContent: React.FC = () => {
 
               {/* Options list */}
               <div className="space-y-2 pt-1">
-                {currentQuestion.options.map((option, idx) => {
+                {(Array.isArray(currentQuestion.options) ? currentQuestion.options : []).map((option, idx) => {
                   const isSelected = selectedOption === option;
                   const isCorrect = option === currentQuestion.correct_answer;
 
