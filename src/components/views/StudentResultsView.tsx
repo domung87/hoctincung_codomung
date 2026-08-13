@@ -24,10 +24,11 @@ export const StudentResultsView: React.FC = () => {
   const { currentUser } = useAuth();
 
   // Find evaluation for current student or fallback to first student
+  const currentFullName = currentUser?.full_name || '';
+  const currentId = currentUser?.id || '';
   const studentEval = INITIAL_EVALUATIONS.find((e: any) => 
-    e.student_id === currentUser.id || 
-    currentUser.full_name.includes(e.student_name) ||
-    e.student_name.includes(currentUser.full_name)
+    (currentId && e.student_id === currentId) || 
+    (currentFullName && e.student_name && (currentFullName.includes(e.student_name) || e.student_name.includes(currentFullName)))
   ) || INITIAL_EVALUATIONS[0];
 
   const getGradeBadge = (level: string) => {

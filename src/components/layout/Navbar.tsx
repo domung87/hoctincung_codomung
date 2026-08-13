@@ -74,16 +74,18 @@ export const Navbar: React.FC = () => {
     }
   };
 
-  const getInitials = (name: string) => {
-    const parts = name.trim().split(' ');
+  const getInitials = (name?: string) => {
+    if (!name || typeof name !== 'string') return 'HS';
+    const parts = name.trim().split(' ').filter(Boolean);
     if (parts.length >= 2) {
-      return parts[parts.length - 2][0] + parts[parts.length - 1][0];
+      return (parts[parts.length - 2][0] || '') + (parts[parts.length - 1][0] || '');
     }
-    return name.slice(0, 2).toUpperCase();
+    return name.slice(0, 2).toUpperCase() || 'HS';
   };
 
-  const getShortName = (name: string) => {
-    const parts = name.trim().split(' ');
+  const getShortName = (name?: string) => {
+    if (!name || typeof name !== 'string') return 'Học Sinh';
+    const parts = name.trim().split(' ').filter(Boolean);
     if (parts.length >= 2) {
       return parts[parts.length - 2] + ' ' + parts[parts.length - 1];
     }

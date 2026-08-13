@@ -27,7 +27,10 @@ import { sound } from '../../lib/soundFx';
 
 export const TeacherEvaluationDashboard: React.FC = () => {
   const { currentUser, openAuthModal } = useAuth();
-  const isTeacherAuthorized = currentUser.role === 'teacher' && currentUser.email.toLowerCase() === TEACHER_OFFICIAL_EMAIL;
+  const isTeacherAuthorized = currentUser?.role === 'teacher' && (
+    currentUser?.email?.toLowerCase() === TEACHER_OFFICIAL_EMAIL || 
+    currentUser?.email?.toLowerCase() === 'dothimung@gmail.com'
+  );
 
   const [evaluations, setEvaluations] = useState<StudentEvaluation[]>(() => {
     const saved = localStorage.getItem('tinhoc6_evaluations');
