@@ -12,11 +12,11 @@ import {
 export const INITIAL_PROFILES: UserProfile[] = [
   {
     id: 'teacher-co-do-mung',
-    email: 'codomung@gmail.com',
-    full_name: 'Cô Đỗ Mừng',
+    email: 'dothimung87@gmail.com',
+    full_name: 'Cô Đỗ Thị Mừng',
     role: 'teacher',
     classroom: 'Khối 6',
-    username: 'codomung',
+    username: 'dothimung87',
     password: '123',
     avatar_url: '/images/avatar_co_mung.jpg',
     bio: 'Giáo viên Giảng dạy Tin học 6 - Bộ Sách Kết Nối Tri Thức Với Cuộc Sống 💖',

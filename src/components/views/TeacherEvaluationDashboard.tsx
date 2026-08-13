@@ -14,14 +14,21 @@ import {
   Flame, 
   FileSpreadsheet,
   Star,
-  ChevronDown
+  ChevronDown,
+  Lock,
+  ShieldAlert,
+  KeyRound
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { StudentEvaluation, GradeLevel } from '../../types';
 import { INITIAL_EVALUATIONS } from '../../lib/mockData';
+import { useAuth, TEACHER_OFFICIAL_EMAIL } from '../../context/AuthContext';
 import { sound } from '../../lib/soundFx';
 
 export const TeacherEvaluationDashboard: React.FC = () => {
+  const { currentUser, openAuthModal } = useAuth();
+  const isTeacherAuthorized = currentUser.role === 'teacher' && currentUser.email.toLowerCase() === TEACHER_OFFICIAL_EMAIL;
+
   const [evaluations, setEvaluations] = useState<StudentEvaluation[]>(() => {
     const saved = localStorage.getItem('tinhoc6_evaluations');
     return saved ? JSON.parse(saved) : INITIAL_EVALUATIONS;
@@ -128,6 +135,39 @@ export const TeacherEvaluationDashboard: React.FC = () => {
         return <span className="px-2.5 py-1 rounded-full bg-rose-100 text-rose-800 font-extrabold text-[10px]">Chưa Đạt</span>;
     }
   };
+
+  // NẾU CHƯA PHẢI TÀI KHOẢN dothimung87@gmail.com -> HIỂN THỊ MÀN HÌNH KHÓA BẢO MẬT
+  if (!isTeacherAuthorized) {
+    return (
+      <div className="p-8 sm:p-12 rounded-3xl bg-white dark:bg-[#151828] border-2 border-dashed border-blue-200 dark:border-slate-800 shadow-sm text-center space-y-5 animate-in fade-in duration-300 max-w-2xl mx-auto my-6">
+        <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center mx-auto shadow-xl">
+          <Lock className="w-9 h-9" />
+        </div>
+
+        <div className="space-y-2">
+          <span className="px-3.5 py-1 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-extrabold text-xs">
+            🔒 Khu Vực Quản Trị Giáo Viên
+          </span>
+          <h3 className="text-xl sm:text-2xl font-black text-slate-800 dark:text-white">
+            Bảng Theo Dõi & Đánh Giá Học Sinh Bị Khóa
+          </h3>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+            Chỉ duy nhất tài khoản Gmail chính thức của Cô Đỗ Mừng (<strong>{TEACHER_OFFICIAL_EMAIL}</strong>) mới có quyền mở và quản lý sổ theo dõi điểm của học sinh.
+          </p>
+        </div>
+
+        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <button
+            onClick={() => openAuthModal('teacher_login')}
+            className="w-full sm:w-auto px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-xs sm:text-sm shadow-md transition-all hover:scale-105 flex items-center justify-center gap-2"
+          >
+            <KeyRound className="w-4 h-4" />
+            <span>🔐 Đăng Nhập Với Gmail {TEACHER_OFFICIAL_EMAIL}</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">

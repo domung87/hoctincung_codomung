@@ -7,6 +7,9 @@ import { sound } from '../lib/soundFx';
 
 export type AuthMode = 'teacher_login' | 'student_login' | 'student_register';
 
+// EMAIL DUY NHẤT ĐƯỢC PHÉP TRUY CẬP VAI TRÒ GIÁO VIÊN CÔ ĐỖ MỪNG
+export const TEACHER_OFFICIAL_EMAIL = 'dothimung87@gmail.com';
+
 interface AuthContextType {
   currentUser: UserProfile;
   isLoggedIn: boolean;
@@ -19,7 +22,13 @@ interface AuthContextType {
   
   // Auth actions
   loginTeacherWithGoogle: (gmail: string) => Promise<{ success: boolean; message: string }>;
-  registerStudent: (fullName: string, classroom: string, username: string, password: string) => Promise<{ success: boolean; message: string }>;
+  registerStudent: (
+    fullName: string, 
+    classroom: string, 
+    username: string, 
+    password: string,
+    avatarUrl?: string
+  ) => Promise<{ success: boolean; message: string }>;
   loginStudent: (usernameOrName: string, password: string) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
   
@@ -33,14 +42,25 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const STORAGE_KEY_PROFILES = 'tinhoc6_profiles_v2';
-const STORAGE_KEY_CURRENT_USER_ID = 'tinhoc6_current_user_id_v2';
-const STORAGE_KEY_IS_LOGGED_IN = 'tinhoc6_is_logged_in_v2';
+const STORAGE_KEY_PROFILES = 'tinhoc6_profiles_v3';
+const STORAGE_KEY_CURRENT_USER_ID = 'tinhoc6_current_user_id_v3';
+const STORAGE_KEY_IS_LOGGED_IN = 'tinhoc6_is_logged_in_v3';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [profiles, setProfiles] = useState<UserProfile[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY_PROFILES);
-    return saved ? JSON.parse(saved) : INITIAL_PROFILES;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // Ensure teacher email is updated to dothimung87@gmail.com
+        return parsed.map((p: UserProfile) => 
+          p.role === 'teacher' ? { ...p, email: TEACHER_OFFICIAL_EMAIL, full_name: 'Cô Đỗ Thị Mừng' } : p
+        );
+      } catch (e) {
+        return INITIAL_PROFILES;
+      }
+    }
+    return INITIAL_PROFILES;
   });
 
   const [currentUserId, setCurrentUserId] = useState<string>(() => {
@@ -77,7 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsAuthModalOpen(true);
   };
 
-  // 1. Giáo viên đăng nhập bằng Gmail
+  // 1. GIÁO VIÊN ĐĂNG NHẬP: CHỈ CHO PHÉP DUY NHẤT TÀI KHOẢN dothimung87@gmail.com
   const loginTeacherWithGoogle = async (gmail: string): Promise<{ success: boolean; message: string }> => {
     sound.click();
     const cleanEmail = gmail.trim().toLowerCase();
@@ -86,24 +106,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: false, message: 'Vui lòng nhập địa chỉ Gmail hợp lệ.' };
     }
 
-    let teacher = profiles.find(p => p.role === 'teacher' && p.email.toLowerCase() === cleanEmail);
+    // KIỂM TRA BẢO MẬT: CHỈ DUY NHẤT dothimung87@gmail.com MỚI ĐƯỢC MỞ
+    if (cleanEmail !== TEACHER_OFFICIAL_EMAIL) {
+      sound.wrong();
+      return { 
+        success: false, 
+        message: `Quyền truy cập bị từ chối! Chỉ tài khoản Gmail chính thức của Cô Đỗ Mừng (${TEACHER_OFFICIAL_EMAIL}) mới có quyền mở giao diện Giáo viên quản trị!` 
+      };
+    }
+
+    let teacher = profiles.find(p => p.role === 'teacher' && p.email.toLowerCase() === TEACHER_OFFICIAL_EMAIL);
 
     if (!teacher) {
-      // Create new Teacher profile
+      // Khởi tạo tài khoản Giáo viên chuẩn
       const newTeacher: UserProfile = {
-        id: 'teacher-' + Date.now(),
-        email: cleanEmail,
-        full_name: cleanEmail.includes('codomung') ? 'Cô Đỗ Mừng' : 'Giáo Viên (' + cleanEmail.split('@')[0] + ')',
+        id: 'teacher-co-do-mung',
+        email: TEACHER_OFFICIAL_EMAIL,
+        full_name: 'Cô Đỗ Thị Mừng',
         role: 'teacher',
+        classroom: 'Khối 6',
+        username: 'dothimung87',
+        password: '123',
         avatar_url: '/images/avatar_co_mung.jpg',
-        bio: 'Giáo viên Giảng dạy Tin học 6 - Bộ Sách Kết Nối Tri Thức 💖',
+        bio: 'Giáo viên Giảng dạy Tin học 6 - Bộ Sách Kết Nối Tri Thức Với Cuộc Sống 💖',
         xp: 9999,
         level: 25,
         coins: 5000,
         streak_days: 90,
         created_at: new Date().toISOString()
       };
-      setProfiles(prev => [newTeacher, ...prev]);
+      setProfiles(prev => [newTeacher, ...prev.filter(p => p.id !== newTeacher.id)]);
       teacher = newTeacher;
       updateProfileInSupabase(newTeacher);
     }
@@ -111,19 +143,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCurrentUserId(teacher.id);
     setIsLoggedIn(true);
     sound.victory();
-    confetti({ particleCount: 80, spread: 70 });
-    return { success: true, message: `Chào mừng ${teacher.full_name} đã đăng nhập thành công!` };
+    confetti({ particleCount: 100, spread: 80, origin: { y: 0.4 } });
+    return { 
+      success: true, 
+      message: `Chào mừng Cô Đỗ Thị Mừng (${TEACHER_OFFICIAL_EMAIL}) đã đăng nhập thành công vào Hệ thống Quản Trị Giáo Viên!` 
+    };
   };
 
-  // 2. Học sinh Đăng Ký (Tên, Lớp, Tên đăng nhập, Mật khẩu)
+  // 2. HỌC SINH ĐĂNG KÝ (HỌ TÊN, LỚP, TÊN ĐĂNG NHẬP, MẬT KHẨU, AVATAR)
   const registerStudent = async (
     fullName: string, 
     classroom: string, 
     username: string, 
-    password: string
+    password: string,
+    avatarUrl?: string
   ): Promise<{ success: boolean; message: string }> => {
     sound.click();
-    const cleanUser = username.trim().toLowerCase();
+    const cleanUser = username.trim().toLowerCase().replace(/\s+/g, '');
     const cleanName = fullName.trim();
     const cleanClass = classroom.trim();
 
@@ -131,10 +167,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: false, message: 'Vui lòng điền đầy đủ tất cả các trường thông tin.' };
     }
 
+    if (cleanUser.length < 3) {
+      return { success: false, message: 'Tên đăng nhập phải có ít nhất 3 ký tự viết liền không dấu.' };
+    }
+
+    if (password.length < 4) {
+      return { success: false, message: 'Mật khẩu phải có ít nhất 4 ký tự.' };
+    }
+
     const exists = profiles.find(p => p.username?.toLowerCase() === cleanUser);
     if (exists) {
-      return { success: false, message: `Tên đăng nhập "${username}" đã có người sử dụng. Em hãy chọn tên khác nhé!` };
+      return { success: false, message: `Tên đăng nhập "${cleanUser}" đã có bạn sử dụng rồi. Em hãy chọn tên đăng nhập khác nhé!` };
     }
+
+    const finalAvatar = avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${cleanUser}`;
 
     const newStudent: UserProfile = {
       id: 'student-' + Date.now(),
@@ -144,8 +190,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       username: cleanUser,
       password: password,
       role: 'student',
-      avatar_url: `https://api.dicebear.com/7.x/bottts/svg?seed=${cleanUser}`,
-      bio: `Học sinh ${cleanClass} - Cùng học Tin 6 với Cô Đỗ Mừng 🌸`,
+      avatar_url: finalAvatar,
+      bio: `Học sinh lớp ${cleanClass} - Cùng học Tin 6 với Cô Đỗ Mừng 🌸`,
       xp: 100,
       level: 1,
       coins: 50,
@@ -157,37 +203,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCurrentUserId(newStudent.id);
     setIsLoggedIn(true);
     sound.victory();
-    confetti({ particleCount: 100, spread: 80 });
+    confetti({ particleCount: 120, spread: 90, origin: { y: 0.5 } });
 
     // Sync to Supabase in background
     updateProfileInSupabase(newStudent);
 
-    return { success: true, message: `Chúc mừng ${cleanName} (${cleanClass}) đã đăng ký thành công!` };
+    return { 
+      success: true, 
+      message: `🎉 Chúc mừng em ${cleanName} (${cleanClass}) đã đăng ký thành công! Em được tặng ngay 100 XP và 50 Xu Coins để bắt đầu học tập!` 
+    };
   };
 
-  // 3. Học sinh Đăng Nhập
+  // 3. HỌC SINH ĐĂNG NHẬP (TÊN ĐĂNG NHẬP HOẶC HỌ TÊN VÀ MẬT KHẨU)
   const loginStudent = async (usernameOrName: string, password: string): Promise<{ success: boolean; message: string }> => {
     sound.click();
     const cleanQuery = usernameOrName.trim().toLowerCase();
 
+    if (!cleanQuery) {
+      return { success: false, message: 'Vui lòng nhập Tên đăng nhập hoặc Họ tên học sinh.' };
+    }
+
     const student = profiles.find(p => 
       p.role === 'student' && 
-      (p.username?.toLowerCase() === cleanQuery || p.full_name.toLowerCase().includes(cleanQuery) || p.email.toLowerCase() === cleanQuery)
+      (
+        p.username?.toLowerCase() === cleanQuery || 
+        p.full_name.toLowerCase() === cleanQuery ||
+        p.full_name.toLowerCase().includes(cleanQuery) || 
+        p.email.toLowerCase() === cleanQuery
+      )
     );
 
     if (!student) {
-      return { success: false, message: 'Không tìm thấy tài khoản học sinh. Em vui lòng kiểm tra lại hoặc Đăng ký tài khoản mới.' };
+      sound.wrong();
+      return { 
+        success: false, 
+        message: 'Không tìm thấy tài khoản học sinh phù hợp. Em vui lòng kiểm tra lại Tên đăng nhập hoặc bấm Đăng Ký Tài Khoản Mới nhé!' 
+      };
     }
 
     if (student.password && student.password !== password) {
-      return { success: false, message: 'Mật khẩu chưa chính xác. Em vui lòng nhập lại nhé.' };
+      sound.wrong();
+      return { success: false, message: 'Mật khẩu chưa chính xác. Em vui lòng kiểm tra lại mật khẩu nhé!' };
     }
 
     setCurrentUserId(student.id);
     setIsLoggedIn(true);
     sound.victory();
-    confetti({ particleCount: 70, spread: 60 });
-    return { success: true, message: `Chào mừng ${student.full_name} (${student.classroom || 'Lớp 6'}) đã quay trở lại học tập!` };
+    confetti({ particleCount: 80, spread: 70 });
+    return { 
+      success: true, 
+      message: `🌸 Chào mừng ${student.full_name} (${student.classroom || 'Lớp 6'}) đã quay trở lại lớp học Tin học 6 cùng Cô Đỗ Mừng!` 
+    };
   };
 
   const logout = () => {
@@ -197,10 +263,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const switchRole = (role: UserRole) => {
     sound.click();
-    const target = profiles.find(p => p.role === role);
-    if (target) {
-      setCurrentUserId(target.id);
-      setIsLoggedIn(true);
+    if (role === 'teacher') {
+      // Chỉ cho phép chuyển sang giáo viên nếu có tài khoản dothimung87@gmail.com
+      const teacher = profiles.find(p => p.role === 'teacher' && p.email.toLowerCase() === TEACHER_OFFICIAL_EMAIL);
+      if (teacher) {
+        setCurrentUserId(teacher.id);
+        setIsLoggedIn(true);
+      } else {
+        openAuthModal('teacher_login');
+      }
+    } else {
+      const target = profiles.find(p => p.role === role);
+      if (target) {
+        setCurrentUserId(target.id);
+        setIsLoggedIn(true);
+      }
     }
   };
 
